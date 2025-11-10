@@ -1,12 +1,13 @@
 {
-  "name": "Project02",
+  "name": "project02",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
+  "repository": { 
     "type": "git",
     "url": "git+https://github.com/Globoxik/PZAW_PROJECTS.git"
   },
