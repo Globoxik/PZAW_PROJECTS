@@ -1,9 +1,14 @@
 import express from 'express';
+import { DatabaseSync } from "node:sqlite";
 
+const db = new DatabaseSync("cards.db");
+console.log("Cards in DB:", db.prepare("SELECT COUNT(*) AS count FROM cards").get());
 const port = 5943;
 
 const app = express();
 app.set("view engine", "ejs");
+
+app.use(express.urlencoded({ extended: true }));
 
 
 app.get("/", (req, res) => {
@@ -13,19 +18,16 @@ app.get("/", (req, res) => {
 });
 
 app.get("/card_db", (req, res) => {
-    res.render("card_db", {
-        title: "Wyszkukiwarka kart"
+  res.render("card_db", {
+    title: "Wyszukiwarka kart",
+    card: null,
+    error: null
   });
 });
 
-app.get("/card_db/search", (req, res) => {
-  const cardName = req.query.name;
-  res.redirect(`/card_db/${encodeURIComponent(cardName)}`);
-});
 
-
-app.get("/card_db/:name", async (req, res) => {
-  const cardName = req.params.name;
+app.post("/card_db/search", async (req, res) => {
+  const cardName = req.body.name;
 
   try {
     const response = await fetch(
@@ -33,7 +35,6 @@ app.get("/card_db/:name", async (req, res) => {
     );
 
     const json = await response.json();
-
     const card = json.data[0];
 
     const result = {
@@ -48,12 +49,22 @@ app.get("/card_db/:name", async (req, res) => {
       image: card.card_images[0].image_url
     };
 
-    res.json(result);
+
+      res.render("card_db", {
+        title: "Wyszukiwarka kart",
+        card: result,
+        error: null
+      });
+
+
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch YGO card data" });
+    res.render("card_db", {
+      title: "Wyszukiwarka kart",
+      card: null,
+      error: "Nie znaleziono takiej karty."
+    });
   }
 });
-
 
 
 app.listen(port, () => {

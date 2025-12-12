@@ -1,11 +1,36 @@
 <%- include("./header.partial.ejs") %>
-<h1> Witamy w wyszukiwarce kart!</h1>
-<h2>Wpisz poprawna nazwę karty z Yu-Gi-Oh!</h2>
 
-<form action="/card_db/search" method="GET">
+<h1>Witamy w wyszukiwarce kart!</h1>
+<h2>Wpisz poprawną nazwę karty z Yu-Gi-Oh!</h2>
+
+<form action="/card_db/search" method="POST">
   <input type="text" name="name" placeholder="Wyszukaj kartę..." required>
   <button type="submit">Szukaj</button>
 </form>
 
-<div id="results"></div>
+<hr>
+
+<% if (error) { %>
+  <p style="color: red;"><%= error %></p>
+<% } %>
+
+<% if (card) { %>
+  <h2><%= card.name %></h2>
+
+  <img src="<%= card.image %>" width="300">
+
+  <p><strong>Typ:</strong>  <%= card.race %> <%= card.type %></p>
+  <p><strong>Opis:</strong> <%= card.description %></p>
+
+  <p>
+    <strong>ATK:</strong> <%= card.attack %> |
+    <strong>DEF:</strong> <%= card.defense %>
+  </p>
+
+  <p>
+    <strong>Poziom:</strong> <%= card.level %><br>
+    <strong>Atrybut:</strong> <%= card.attribute %>
+  </p>
+<% } %>
+
 <%- include("./footer.partial.ejs") %>
