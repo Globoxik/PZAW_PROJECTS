@@ -1,3 +1,11 @@
 <%- include("./header.partial.ejs") %>
+<h1> Witamy w wyszukiwarce kart!</h1>
+<h2>Wpisz poprawna nazwę karty z Yu-Gi-Oh!</h2>
 
+<form action="/card_db/search" method="GET">
+  <input type="text" name="name" placeholder="Wyszukaj kartę..." required>
+  <button type="submit">Szukaj</button>
+</form>
+
+<div id="results"></div>
 <%- include("./footer.partial.ejs") %>

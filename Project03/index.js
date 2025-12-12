@@ -18,6 +18,12 @@ app.get("/card_db", (req, res) => {
   });
 });
 
+app.get("/card_db/search", (req, res) => {
+  const cardName = req.query.name;
+  res.redirect(`/card_db/${encodeURIComponent(cardName)}`);
+});
+
+
 app.get("/card_db/:name", async (req, res) => {
   const cardName = req.params.name;
 
@@ -26,13 +32,28 @@ app.get("/card_db/:name", async (req, res) => {
       `https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(cardName)}`
     );
 
-    const data = await response.json();
+    const json = await response.json();
 
-    res.json(data); // return to browser
+    const card = json.data[0];
+
+    const result = {
+      name: card.name,
+      type: card.type,
+      description: card.desc,
+      attack: card.atk,
+      defense: card.def,
+      level: card.level,
+      race: card.race,
+      attribute: card.attribute,
+      image: card.card_images[0].image_url
+    };
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch YGO card data" });
   }
 });
+
 
 
 app.listen(port, () => {
