@@ -1,0 +1,21 @@
+<%- include("./header.partial.ejs") %>
+
+<h1>Edytuj kartę</h1>
+
+<form method="POST" action="/owned/edit/<%= card.id %>">
+  <p>
+    <strong><%= card.name %></strong>
+  </p>
+
+  <label>
+    Ilość:
+    <input type="number" name="quantity" value="<%= card.quantity %>" min="0">
+  </label>
+
+  <br><br>
+
+  <button type="submit">Zapisz</button>
+  <a href="/owned">Anuluj</a>
+</form>
+
+<%- include("./footer.partial.ejs") %>

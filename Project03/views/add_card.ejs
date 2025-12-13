@@ -1,0 +1,25 @@
+<%- include("./header.partial.ejs") %>
+
+<h1>Dodaj kartę do kolekcji</h1>
+
+<form action="/card/add" method="POST">
+  <label>
+    Nazwa karty:
+    <input type="text" name="name" required>
+  </label>
+  <br><br>
+
+  <label>
+    Ilość:
+    <input type="number" name="quantity" min="1" value="1" required>
+  </label>
+  <br><br>
+
+  <button type="submit">Dodaj kartę</button>
+</form>
+  <br><a href="/owned">Anuluj</a>
+<% if (error) { %>
+  <p style="color:red;"><%= error %></p>
+<% } %>
+
+<%- include("./footer.partial.ejs") %>
