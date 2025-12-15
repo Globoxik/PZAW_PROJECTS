@@ -22,4 +22,9 @@
   <p style="color:red;"><%= error %></p>
 <% } %>
 
+<% if (success) { %>
+  <p style="color: lightgreen;"><%= success %></p>
+<% } %>
+
+
 <%- include("./footer.partial.ejs") %>

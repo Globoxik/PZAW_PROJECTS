@@ -13,6 +13,11 @@
   <p style="color:red;"><%= error %></p>
 <% } %>
 
+<% if (success) { %>
+  <p style="color: lightgreen;"><%= success %></p>
+<% } %>
+
+
 <% if (card) { %>
 
   <h2><%= card.name %></h2>
@@ -22,19 +27,19 @@
   <p><strong>Typ:</strong> <%= card.race %> <%= card.type %></p>
   <p><strong>Opis:</strong> <%= card.description %></p>
 
-  <% if (card.type.includes("Monster")) { %>
-    <p>
-      <strong>ATK:</strong> <%= card.attack %> |
-      <strong>DEF:</strong> <%= card.defense %>
-    </p>
+<% if (card.type.includes("Monster")) { %>
+  <p>
+    <strong>ATK:</strong> <%= (card.attack === "-1") ? "?" : (card.attack ?? "-") %> |
+    <strong>DEF:</strong> <%= (card.defense === "-1") ? "?" : (card.defense ?? "-") %>
+  </p>
 
-    <p>
-      <strong>Poziom:</strong> <%= card.level %><br>
-      <strong>Atrybut:</strong> <%= card.attribute %>
-    </p>
-  <% } %>
+  <p>
+    <strong>Poziom:</strong> <%= card.level ?? "-" %><br>
+    <strong>Atrybut:</strong> <%= card.attribute ?? "-" %>
+  </p>
+<% } %>
 
-  <!-- ✅ ADD TO DATABASE FORM -->
+
   <form action="/card/add" method="POST">
     <input type="hidden" name="name" value="<%= card.name %>">
     <input type="hidden" name="redirectTo" value="/card_db">

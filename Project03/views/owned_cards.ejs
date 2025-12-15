@@ -34,26 +34,31 @@
   <td><%= card.type %></td>
 
   <% if (card.type.includes("Monster")) { %>
-    <td><%= card.atk %></td>
-    <td><%= card.def %></td>
-  <% } else { %>
-    <td>-</td>
-    <td>-</td>
-  <% } %>
+  <td>
+    <%= (card.atk === "-1") ? "?" : (card.atk ?? "-") %>
+  </td>
+  <td>
+    <%= (card.def === "-1") ? "?" : (card.def ?? "-") %>
+  </td>
+<% } else { %>
+  <td>-</td>
+  <td>-</td>
+<% } %>
+
 
   <td><%= card.quantity %></td>
 
-  <!-- EDIT COLUMN -->
+
   <td>
-    <a href="/owned/edit/<%= card.id %>">✏️</a>
+    <a href="/owned/edit/<%= card.id %>">Edytuj</a>
   </td>
 
-  <!-- DELETE COLUMN -->
+
   <td>
     <form action="/owned/delete/<%= card.id %>" method="POST">
       <button type="submit"
         onclick="return confirm('Usunąć kartę?')">
-        🗑
+        Usuń
       </button>
     </form>
   </td>

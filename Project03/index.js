@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 
-function insertRandomCards(db) {
+function insertTestCards(db) {
   const cards = [
     ["Dark Magician", "DARK", 7, "Spellcaster Normal Monster", "2500", "2100"],
     ["Blue-Eyes White Dragon", "LIGHT", 8, "Dragon Normal Monster", "3000", "2500"],
@@ -30,28 +30,27 @@ function insertRandomCards(db) {
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
-  for (let i = 0; i < 10; i++) {
-    const card = cards[Math.floor(Math.random() * cards.length)];
-    const quantity = Math.floor(Math.random() * 5) + 1;
-
+  
+  cards.forEach(card => {
     insert.run(
-      card[0],
-      card[1],
-      card[2],
-      card[3],
-      card[4],
-      card[5],
-      quantity
+      card[0],  
+      card[1],  
+      card[2],  
+      card[3],  
+      card[4],  
+      card[5],  
+      1         
     );
-  }
+  });
 }
+
 
 function deleteAllCards(db) {
   db.prepare("DELETE  FROM cards").run();
 }
 
 // deleteAllCards(db);
-// insertRandomCards(db);
+// insertTestCards(db);
 
 
 
@@ -65,7 +64,8 @@ app.get("/card_db", (req, res) => {
   res.render("card_db", {
     title: "Wyszukiwarka kart",
     card: null,
-    error: null
+    error: null,
+    success: null
   });
 });
 
@@ -97,7 +97,8 @@ app.post("/card_db/search", async (req, res) => {
       res.render("card_db", {
         title: "Wyszukiwarka kart",
         card: result,
-        error: null
+        error: null,
+        success: null
       });
 
 
@@ -105,7 +106,8 @@ app.post("/card_db/search", async (req, res) => {
     res.render("card_db", {
       title: "Wyszukiwarka kart",
       card: null,
-      error: "Nie znaleziono takiej karty."
+      error: "Nie znaleziono takiej karty.",
+      success: null
     });
   }
 });
@@ -168,7 +170,8 @@ app.post("/owned/delete/:id", (req, res) => {
 app.get("/owned/add", (req, res) => {
   res.render("add_card", {
     title: "Dodaj kartę",
-    error: null
+    error: null,
+    success: null
   });
 });
 
@@ -176,15 +179,24 @@ app.get("/owned/add", (req, res) => {
 app.post("/card/add", async (req, res) => {
   const { name, quantity, redirectTo } = req.body;
 
+  const isCardDb = redirectTo === "/card_db";
+
   try {
     const response = await fetch(
       `https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(name)}`
     );
-
     const json = await response.json();
 
     if (!json.data || !json.data[0]) {
-      return res.redirect(redirectTo || "/card_db");
+      return res.render(
+        isCardDb ? "card_db" : "add_card",
+        {
+          title: isCardDb ? "Wyszukiwarka kart" : "Dodaj kartę",
+          card: null,
+          error: "Nie znaleziono takiej karty.",
+          success: null
+        }
+      );
     }
 
     const card = json.data[0];
@@ -211,20 +223,47 @@ app.post("/card/add", async (req, res) => {
         card.name,
         card.attribute || null,
         level,
-        card.race + ' ' + card.type,
+        card.race + " " + card.type,
         atk,
         def,
         Number(quantity)
       );
     }
 
-    res.redirect(redirectTo || "/owned");
+    return res.render(
+      isCardDb ? "card_db" : "add_card",
+      {
+        title: isCardDb ? "Wyszukiwarka kart" : "Dodaj kartę",
+        card: isCardDb ? {
+          name: card.name,
+          type: card.type,
+          description: card.desc,
+          attack: card.atk,
+          defense: card.def,
+          level: card.level,
+          race: card.race,
+          attribute: card.attribute,
+          image: card.card_images[0].image_url
+        } : null,
+        error: null,
+        success: "Karta została dodana do kolekcji."
+      }
+    );
 
   } catch (err) {
     console.error(err);
-    res.redirect(redirectTo || "/owned");
+    res.render(
+      isCardDb ? "card_db" : "add_card",
+      {
+        title: isCardDb ? "Wyszukiwarka kart" : "Dodaj kartę",
+        card: null,
+        error: "Karta nie istenieje badź nazwa jest niepoprawna.",
+        success: null
+      }
+    );
   }
 });
+
 
 
 
