@@ -13,20 +13,20 @@ app.use(express.static("public"));
 
 function insertRandomCards(db) {
   const cards = [
-    ["Dark Magician", "DARK", 7, "Spellcaster", "2500", "2100"],
-    ["Blue-Eyes White Dragon", "LIGHT", 8, "Dragon", "3000", "2500"],
-    ["Red-Eyes Black Dragon", "DARK", 7, "Dragon", "2400", "2000"],
-    ["Summoned Skull", "DARK", 6, "Fiend", "2500", "1200"],
-    ["Celtic Guardian", "EARTH", 4, "Warrior", "1400", "1200"],
-    ["Kuriboh", "DARK", 1, "Fiend", "300", "200"],
-    ["Jinzo", "DARK", 6, "Machine", "2400", "1500"],
-    ["Dark Magician Girl", "DARK", 6, "Spellcaster", "2000", "1700"],
-    ["Elemental HERO Neos", "LIGHT", 7, "Warrior", "2500", "2000"],
-    ["Blue-Eyes Chaos MAX Dragon", "LIGHT", 8, "Dragon", "4000", "0"]
+    ["Dark Magician", "DARK", 7, "Spellcaster Normal Monster", "2500", "2100"],
+    ["Blue-Eyes White Dragon", "LIGHT", 8, "Dragon Normal Monster", "3000", "2500"],
+    ["Red-Eyes Black Dragon", "DARK", 7, "Dragon Normal Monster", "2400", "2000"],
+    ["Summoned Skull", "DARK", 6, "Fiend Normal Monster", "2500", "1200"],
+    ["Celtic Guardian", "EARTH", 4, "Warrior Normal Monster", "1400", "1200"],
+    ["Kuriboh", "DARK", 1, "Fiend Effect Monster", "300", "200"],
+    ["Jinzo", "DARK", 6, "Machine Effect Monster", "2400", "1500"],
+    ["Dark Magician Girl", "DARK", 6, "Spellcaster Effect Monster", "2000", "1700"],
+    ["Elemental HERO Neos", "LIGHT", 7, "Warrior Effect Monster", "2500", "2000"],
+    ["Blue-Eyes Chaos MAX Dragon", "LIGHT", 8, "Dragon Effect Monster", "4000", "0"]
   ];
 
   const insert = db.prepare(`
-    INSERT INTO cards (name, attribute, level, type, atk, def, quantity)
+    INSERT INTO cards (name, attribute, level, type, "atk", "def", quantity)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
@@ -50,8 +50,8 @@ function deleteAllCards(db) {
   db.prepare("DELETE  FROM cards").run();
 }
 
-//deleteAllCards(db);
-//insertRandomCards(db);
+// deleteAllCards(db);
+// insertRandomCards(db);
 
 
 
@@ -113,7 +113,7 @@ app.post("/card_db/search", async (req, res) => {
 app.get("/owned", (req, res) => {
   try {
     const cards = db.prepare(`
-      SELECT id, name, attribute, level, type, atk, def, quantity
+      SELECT id, name, attribute, level, type, "atk", "def", quantity
       FROM cards
       ORDER BY id ASC
     `).all();
