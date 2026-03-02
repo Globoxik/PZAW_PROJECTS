@@ -1,0 +1,72 @@
+<%- include("./header.partial.ejs") %>
+<h1>Moje karty</h1>
+
+<table border="1" cellpadding="6" cellspacing="0">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Nazwa</th>
+    <th>Atrybut</th>
+    <th>Poziom</th>
+    <th>Typ</th>
+    <th>ATK</th>
+    <th>DEF</th>
+    <th>Ilość</th>
+    <th>Edytuj</th>
+    <th>Usuń</th>
+  </tr>
+</thead>
+
+
+  <tbody>
+    <% if (cards.length === 0) { %>
+      <tr>
+        <td colspan="8">Brak kart w bazie</td>
+      </tr>
+    <% } %>
+
+    <% cards.forEach(card => { %>
+      <tr>
+  <td><%= card.id %></td>
+  <td><%= card.name %></td>
+  <td><%= card.attribute ?? "-" %></td>
+  <td><%= card.level ?? "-" %></td>
+  <td><%= card.type %></td>
+
+  <% if (card.type.includes("Monster")) { %>
+  <td>
+    <%= (card.atk === "-1") ? "?" : (card.atk ?? "-") %>
+  </td>
+  <td>
+    <%= (card.def === "-1") ? "?" : (card.def ?? "-") %>
+  </td>
+<% } else { %>
+  <td>-</td>
+  <td>-</td>
+<% } %>
+
+
+  <td><%= card.quantity %></td>
+
+
+  <td>
+    <a href="/owned/edit/<%= card.id %>">Edytuj</a>
+  </td>
+
+
+  <td>
+    <form action="/owned/delete/<%= card.id %>" method="POST">
+      <button type="submit"
+        onclick="return confirm('Usunąć kartę?')">
+        Usuń
+      </button>
+    </form>
+  </td>
+</tr>
+
+    <% }) %>
+  </tbody>
+</table>
+<a href="/owned/add">Dodaj nową kartę</a><br>
+<a href="/">Powrót</a>
+<%- include("./footer.partial.ejs") %>

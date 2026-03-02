@@ -1,0 +1,57 @@
+<%- include("./header.partial.ejs") %>
+
+<h1>Witamy w wyszukiwarce kart!</h1>
+
+<form action="/card_db/search" method="POST">
+  <input type="text" name="name" placeholder="Wyszukaj kartę..." required>
+  <button type="submit">Szukaj</button>
+</form>
+
+<hr>
+
+<% if (error) { %>
+  <p style="color:red;"><%= error %></p>
+<% } %>
+
+<% if (success) { %>
+  <p style="color: lightgreen;"><%= success %></p>
+<% } %>
+
+
+<% if (card) { %>
+
+  <h2><%= card.name %></h2>
+
+  <img src="<%= card.image %>" width="300">
+
+  <p><strong>Typ:</strong> <%= card.race %> <%= card.type %></p>
+  <p><strong>Opis:</strong> <%= card.description %></p>
+
+<% if (card.type.includes("Monster")) { %>
+  <p>
+    <strong>ATK:</strong> <%= (card.attack === "-1") ? "?" : (card.attack ?? "-") %> |
+    <strong>DEF:</strong> <%= (card.defense === "-1") ? "?" : (card.defense ?? "-") %>
+  </p>
+
+  <p>
+    <strong>Poziom:</strong> <%= card.level ?? "-" %><br>
+    <strong>Atrybut:</strong> <%= card.attribute ?? "-" %>
+  </p>
+<% } %>
+
+
+  <form action="/card/add" method="POST">
+    <input type="hidden" name="name" value="<%= card.name %>">
+    <input type="hidden" name="redirectTo" value="/card_db">
+
+    <label>
+      Ilość:
+      <input type="number" name="quantity" min="1" value="1" required>
+    </label>
+
+    <button type="submit">Dodaj do kolekcji</button>
+  </form>
+
+<% } %>
+<a href="/">Powrót</a>
+<%- include("./footer.partial.ejs") %>
