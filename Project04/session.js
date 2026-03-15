@@ -1,36 +1,32 @@
 import { DatabaseSync } from "node:sqlite";
 import { randomBytes } from "node:crypto";
-
-const db_path = "./users.db";
-const db = new DatabaseSync(db_path, { readBigInts: true });
+import { db } from "./db.js";
 
 const SESSION_COOKIE = "__Host-fisz-id";
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
+// TODO(kleindan) no user model yet
+// remember to add Foreign Key relations later
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS fc_session (
-    id              INTEGER PRIMARY KEY,
-    user_id         INTEGER,
-    created_at      INTEGER
-  ) STRICT;
-  `);
 
 const db_ops = {
   create_session: db.prepare(
     `INSERT INTO fc_session (id, user_id, created_at)
-            VALUES (?, ?, ?) RETURNING id, user_id, created_at;`
+            VALUES (?, ?, ?);`
   ),
   get_session: db.prepare(
     "SELECT id, user_id, created_at from fc_session WHERE id = ?;"
   ),
+  delete_session: db.prepare("DELETE FROM fc_session WHERE id = ?;"),
 };
 
 function createSession(user, res) {
-  let sessionId = randomBytes(8).readBigInt64BE();
+  let sessionId = BigInt.asIntN(63, randomBytes(8).readBigUInt64BE());
   let createdAt = Date.now();
 
-  let session = db_ops.create_session.get(sessionId, user, createdAt);
+  db_ops.create_session.run(sessionId, user, createdAt);
+  let session = { id: sessionId, user_id: user, created_at: createdAt };
+
   res.locals.session = session;
 
   res.cookie(SESSION_COOKIE, session.id.toString(), {
@@ -65,26 +61,32 @@ function sessionHandler(req, res, next) {
       secure: true,
     });
   } else {
-    session = createSession(null, res);
+    res.locals.session = null;
+    res.locals.user = null;
   }
 
-  setImmediate(printUserSession);
+  setImmediate(() => {
+      if (session) {
+          console.info(
+              "Session:",
+              session.id,
+              "user:",
+              session.user_id,
+              "created at:",
+              new Date(Number(session.created_at)).toISOString()
+          );
+      }
+  });
 
   next();
-
-  function printUserSession() {
-    console.info(
-      "Session:",
-      session.id,
-      "user:",
-      session.user,
-      "created at:",
-      new Date(Number(session.created_at)).toISOString()
-    );
-  }
 }
 
-export default {
-  createSession,
-  sessionHandler,
-};
+function deleteSession(res) {
+  if (res.locals.session != null) {
+    db_ops.delete_session.run(res.locals.session.id);
+  }
+  res.clearCookie(SESSION_COOKIE);
+  res.locals.session = null;
+}
+
+export { createSession, sessionHandler, deleteSession };

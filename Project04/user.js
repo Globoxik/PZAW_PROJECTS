@@ -1,21 +1,11 @@
 import { DatabaseSync } from "node:sqlite";
 import argon2 from "argon2";
+import { db } from "./db.js";
 
-const db_path = "./db.sqlite";
-const db = new DatabaseSync(db_path);
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS fc_users (
-    id              INTEGER PRIMARY KEY,
-    username        TEXT UNIQUE,
-    passhash        TEXT,
-    created_at      INTEGER
-  ) STRICT;
-`);
 
 const db_ops = {
   create_user: db.prepare(
-    "INSERT INTO fc_users (username, passhash, created_at) VALUES (?, ?, ?) RETURNING id;",
+    "INSERT INTO fc_users (username, passhash, created_at) VALUES (?, ?, ?);",
   ),
   get_user: db.prepare(
     "SELECT id, username, created_at FROM fc_users WHERE id = ?;",
@@ -26,6 +16,7 @@ const db_ops = {
   get_auth_data: db.prepare(
     "SELECT id, passhash FROM fc_users WHERE username = ?;",
   ),
+  last_insert_id: db.prepare("SELECT last_insert_rowid() as id;"),
 };
 
 export async function createUser(username, password) {
@@ -34,23 +25,22 @@ export async function createUser(username, password) {
   if (existing_user != null) {
     return null;
   }
-
   let createdAt = Date.now();
   let passhash = await argon2.hash(password);
 
-  return db_ops.create_user.get(username, passhash, createdAt);
+  db_ops.create_user.run(username, passhash, createdAt);
+  const row = db_ops.last_insert_id.get();
+  return { id: row.id };
 }
 
 export async function validatePassword(username, password) {
   let auth_data = db_ops.get_auth_data.get(username);
-
   if (auth_data != null) {
     if (await argon2.verify(auth_data.passhash, password)) {
       return auth_data.id;
     }
   }
-
-  return null;
+  return null;  
 }
 
 export function getUser(user_id) {

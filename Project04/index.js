@@ -1,5 +1,8 @@
 import express from 'express';
 import { DatabaseSync } from "node:sqlite";
+import { sessionHandler } from "./session.js";
+import auth from "./auth.js";
+import cookieParser from 'cookie-parser';
 
 const db = new DatabaseSync("cards.db");
 const port = 5943;
@@ -9,6 +12,8 @@ app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use(cookieParser());
+app.use(sessionHandler);
 
 
 function insertTestCards(db) {
@@ -264,6 +269,13 @@ app.post("/card/add", async (req, res) => {
   }
 });
 
+const authRouter = express.Router();
+authRouter.get("/signup", auth.signup_get);
+authRouter.post("/signup", auth.signup_post);
+authRouter.get("/login", auth.login_get);
+authRouter.post("/login", auth.login_post);
+authRouter.get("/logout", auth.logout);
+app.use("/auth", authRouter);
 
 
 
