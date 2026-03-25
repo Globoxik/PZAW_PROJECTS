@@ -40,17 +40,20 @@
 <% } %>
 
 
+  <% if (locals.session && locals.session.user_id) { %>
   <form action="/card/add" method="POST">
     <input type="hidden" name="name" value="<%= card.name %>">
     <input type="hidden" name="redirectTo" value="/card_db">
-
     <label>
       Ilość:
       <input type="number" name="quantity" min="1" value="1" required>
     </label>
-
     <button type="submit">Dodaj do kolekcji</button>
   </form>
+<% } else { %>
+  <p style="color: red;">Musisz być zalogowany, aby dodać kartę do kolekcji.</p>
+  <a href="/auth/login">Zaloguj się</a> lub <a href="/auth/signup">Zarejestruj się</a><br>
+<% } %>
 
 <% } %>
 <a href="/">Powrót</a>

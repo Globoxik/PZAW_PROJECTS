@@ -30,10 +30,13 @@ function insertTestCards(db) {
     ["Blue-Eyes Chaos MAX Dragon", "LIGHT", 8, "Dragon Effect Monster", "4000", "0"]
   ];
 
+
+
   const insert = db.prepare(`
     INSERT INTO cards (name, attribute, level, type, "atk", "def", quantity)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
+
 
   
   cards.forEach(card => {
@@ -49,6 +52,12 @@ function insertTestCards(db) {
   });
 }
 
+    function requireLogin(req, res, next) {
+  if (res.locals.session?.user_id == null) {
+    return res.status(401).render("unauthorized", { title: "Brak dostępu" });
+  }
+  next();
+  }
 
 function deleteAllCards(db) {
   db.prepare("DELETE  FROM cards").run();
@@ -117,7 +126,7 @@ app.post("/card_db/search", async (req, res) => {
   }
 });
 
-app.get("/owned", (req, res) => {
+app.get("/owned", requireLogin, (req, res) => {
   try {
     const cards = db.prepare(`
       SELECT id, name, attribute, level, type, "atk", "def", quantity
@@ -134,7 +143,7 @@ app.get("/owned", (req, res) => {
   }
 });
 
-app.get("/owned/edit/:id", (req, res) => {
+app.get("/owned/edit/:id", requireLogin, (req, res) => {
   const id = req.params.id;
 
   const card = db.prepare(
@@ -151,7 +160,7 @@ app.get("/owned/edit/:id", (req, res) => {
   });
 });
 
-app.post("/owned/edit/:id", (req, res) => {
+app.post("/owned/edit/:id", requireLogin, (req, res) => {
   const id = req.params.id;
   const quantity = req.body.quantity;
 
@@ -162,7 +171,7 @@ app.post("/owned/edit/:id", (req, res) => {
   res.redirect("/owned");
 });
 
-app.post("/owned/delete/:id", (req, res) => {
+app.post("/owned/delete/:id", requireLogin, (req, res) => {
   const id = req.params.id;
 
   db.prepare(
@@ -172,7 +181,7 @@ app.post("/owned/delete/:id", (req, res) => {
   res.redirect("/owned");
 });
 
-app.get("/owned/add", (req, res) => {
+app.get("/owned/add", requireLogin, (req, res) => {
   res.render("add_card", {
     title: "Dodaj kartę",
     error: null,
@@ -181,7 +190,7 @@ app.get("/owned/add", (req, res) => {
 });
 
 
-app.post("/card/add", async (req, res) => {
+app.post("/card/add", requireLogin, async (req, res) => {
   const { name, quantity, redirectTo } = req.body;
 
   const isCardDb = redirectTo === "/card_db";
@@ -268,6 +277,7 @@ app.post("/card/add", async (req, res) => {
     );
   }
 });
+
 
 const authRouter = express.Router();
 authRouter.get("/signup", auth.signup_get);

@@ -73,7 +73,7 @@ export async function login_post(req, res) {
 }
 
 function logout(req, res) {
-  if (res.locals.user != null) {
+  if (res.locals.session != null) {
     deleteSession(res);
   }
   res.redirect("/");

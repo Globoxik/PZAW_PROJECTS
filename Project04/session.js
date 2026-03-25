@@ -21,7 +21,7 @@ const db_ops = {
 };
 
 function createSession(user, res) {
-  let sessionId = BigInt.asIntN(63, randomBytes(8).readBigUInt64BE());
+  let sessionId = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
   let createdAt = Date.now();
 
   db_ops.create_session.run(sessionId, user, createdAt);
@@ -50,7 +50,12 @@ function sessionHandler(req, res, next) {
   }
 
   // sessionId may look valid but might not exist in db
-  if (sessionId != null) session = db_ops.get_session.get(sessionId);
+  if (sessionId != null) {
+  const row = db_ops.get_session.get(sessionId);
+  if (row != null) {
+    session = { ...row, id: BigInt(row.id) };
+  }
+}
   
   if (session != null) {
     res.locals.session = session;
