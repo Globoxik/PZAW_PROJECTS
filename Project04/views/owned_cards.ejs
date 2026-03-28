@@ -5,6 +5,9 @@
   <thead>
   <tr>
     <th>ID</th>
+    <% if (locals.user && locals.user.is_admin) { %>
+   <th>Właściciel</th>
+    <% } %>
     <th>Nazwa</th>
     <th>Atrybut</th>
     <th>Poziom</th>
@@ -28,6 +31,9 @@
     <% cards.forEach(card => { %>
       <tr>
   <td><%= card.id %></td>
+  <% if (locals.user && locals.user.is_admin) { %>
+  <td><%= card.owner %></td>
+  <% } %>
   <td><%= card.name %></td>
   <td><%= card.attribute ?? "-" %></td>
   <td><%= card.level ?? "-" %></td>

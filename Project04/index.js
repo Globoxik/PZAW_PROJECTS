@@ -3,8 +3,24 @@ import { DatabaseSync } from "node:sqlite";
 import { sessionHandler } from "./session.js";
 import auth from "./auth.js";
 import cookieParser from 'cookie-parser';
+import { db as userDb } from "./db.js";
 
 const db = new DatabaseSync("cards.db");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS cards (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id   INTEGER NOT NULL,
+    name      VARCHAR NOT NULL,
+    attribute VARCHAR,
+    level     INTEGER,
+    type      VARCHAR,
+    atk       VARCHAR,
+    def       VARCHAR,
+    quantity  INTEGER
+  );
+`);
+
 const port = 5943;
 
 const app = express();
@@ -128,18 +144,20 @@ app.post("/card_db/search", async (req, res) => {
 
 app.get("/owned", requireLogin, (req, res) => {
   try {
-    const cards = db.prepare(`
-      SELECT id, name, attribute, level, type, "atk", "def", quantity
-      FROM cards
-      ORDER BY id ASC
-    `).all();
+  const cards = res.locals.user.is_admin
+    ? db.prepare(`SELECT * FROM cards ORDER BY id ASC`).all().map(card => ({
+        ...card,
+        owner: userDb.prepare("SELECT username FROM fc_users WHERE id = ?").get(card.user_id)?.username ?? "Unknown"
+      }))
+    : db.prepare(`SELECT * FROM cards WHERE user_id = ? ORDER BY id ASC`).all(res.locals.session.user_id);
 
     res.render("owned_cards", {
       title: "Wszystkie karty",
       cards
     });
   } catch (err) {
-    res.status(500).send("Database error");
+  console.error(err);
+  res.status(500).send("Database error: " + err.message);
   }
 });
 
@@ -147,8 +165,8 @@ app.get("/owned/edit/:id", requireLogin, (req, res) => {
   const id = req.params.id;
 
   const card = db.prepare(
-    "SELECT * FROM cards WHERE id = ?"
-  ).get(id);
+    "SELECT * FROM cards WHERE id = ? AND user_id = ?"
+  ).get(id, res.locals.session.user_id);
 
   if (!card) {
     return res.redirect("/owned");
@@ -165,8 +183,8 @@ app.post("/owned/edit/:id", requireLogin, (req, res) => {
   const quantity = req.body.quantity;
 
   db.prepare(
-    "UPDATE cards SET quantity = ? WHERE id = ?"
-  ).run(quantity, id);
+    "UPDATE cards SET quantity = ? WHERE id = ? AND user_id = ?"
+  ).run(quantity, id, res.locals.session.user_id);
 
   res.redirect("/owned");
 });
@@ -175,8 +193,8 @@ app.post("/owned/delete/:id", requireLogin, (req, res) => {
   const id = req.params.id;
 
   db.prepare(
-    "DELETE FROM cards WHERE id = ?"
-  ).run(id);
+    "DELETE FROM cards WHERE id = ? AND user_id = ?"
+  ).run(id, res.locals.session.user_id);
 
   res.redirect("/owned");
 });
@@ -220,29 +238,28 @@ app.post("/card/add", requireLogin, async (req, res) => {
     const def = card.def != null ? String(card.def) : null;
 
     const existing = db.prepare(
-      "SELECT id FROM cards WHERE name = ?"
-    ).get(card.name);
+  "SELECT id FROM cards WHERE name = ? AND user_id = ?"
+).get(card.name, res.locals.session.user_id);
 
-    if (existing) {
-      db.prepare(`
-        UPDATE cards
-        SET quantity = quantity + ?
-        WHERE id = ?
-      `).run(Number(quantity), existing.id);
-    } else {
-      db.prepare(`
-        INSERT INTO cards (name, attribute, level, type, atk, def, quantity)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        card.name,
-        card.attribute || null,
-        level,
-        card.race + " " + card.type,
-        atk,
-        def,
-        Number(quantity)
-      );
-    }
+  if (existing) {
+    db.prepare(`
+      UPDATE cards SET quantity = quantity + ? WHERE id = ? AND user_id = ?
+    `).run(Number(quantity), existing.id, res.locals.session.user_id);
+  } else {
+    db.prepare(`
+      INSERT INTO cards (user_id, name, attribute, level, type, atk, def, quantity)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      res.locals.session.user_id,
+      card.name,
+      card.attribute || null,
+      level,
+      card.race + " " + card.type,
+      atk,
+      def,
+      Number(quantity)
+    );
+  }
 
     return res.render(
       isCardDb ? "card_db" : "add_card",

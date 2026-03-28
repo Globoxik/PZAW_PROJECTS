@@ -8,3 +8,15 @@
 </head>
 <body>
     
+<header>
+  <div class="header-auth">
+    <% if (locals.user) { %>
+      <span>Zalogowany jako: <strong><%= locals.user.username %></strong></span>
+      <a href="/auth/logout">Wyloguj się</a>
+    <% } else { %>
+      <a href="/auth/login">Zaloguj się</a> 
+      lub
+      <a href="/auth/signup">Zarejestruj się</a>
+    <% } %>
+  </div>
+</header>

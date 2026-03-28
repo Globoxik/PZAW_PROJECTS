@@ -8,7 +8,7 @@ const db_ops = {
     "INSERT INTO fc_users (username, passhash, created_at) VALUES (?, ?, ?);",
   ),
   get_user: db.prepare(
-    "SELECT id, username, created_at FROM fc_users WHERE id = ?;",
+    "SELECT id, username, is_admin, created_at FROM fc_users WHERE id = ?;",
   ),
   find_by_username: db.prepare(
     "SELECT id, username, created_at FROM fc_users WHERE username = ?;",

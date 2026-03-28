@@ -1,6 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { randomBytes } from "node:crypto";
 import { db } from "./db.js";
+import { getUser } from "./user.js";
 
 const SESSION_COOKIE = "__Host-fisz-id";
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -57,11 +58,14 @@ function sessionHandler(req, res, next) {
   }
 }
   
+
   if (session != null) {
     res.locals.session = session;
-    
+    if (session.user_id != null) {
+      res.locals.user = getUser(session.user_id);
+    }
     res.cookie(SESSION_COOKIE, res.locals.session.id.toString(), {
-      maxAge: ONE_WEEK,
+      maxAge: ONE_WEEK, 
       httpOnly: true,
       secure: true,
     });
