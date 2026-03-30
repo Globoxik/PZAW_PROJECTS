@@ -6,10 +6,6 @@ import { getUser } from "./user.js";
 const SESSION_COOKIE = "__Host-fisz-id";
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
-// TODO(kleindan) no user model yet
-// remember to add Foreign Key relations later
-
-
 const db_ops = {
   create_session: db.prepare(
     `INSERT INTO fc_session (id, user_id, created_at)
