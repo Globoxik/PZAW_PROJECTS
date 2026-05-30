@@ -10,7 +10,7 @@ Strona wyszukuje karty poprzez korzystanie z [YGOPRODeck API](https://ygoprodeck
 Karty można wyszukać na stronie [YGOPRODeck](https://ygoprodeck.com).
 
 ## Uruchamianie
-Po pobraniu projektu, aby uruchomić stronę, należy użyć komendy ```npm run start``` w terminalu.
+Po pobraniu projektu, aby uruchomić stronę, należy przejść do folderu z projektem i następnie użyć komendy ```npm run start``` w terminalu.
 
 ## Dodatkowe funkcje
 Strona posiada dodatkowe funkcje, których można użyć po utworzeniu konta użytkownika (konto admina sie nie liczy):
