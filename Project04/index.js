@@ -1,25 +1,8 @@
 import express from 'express';
-import { DatabaseSync } from "node:sqlite";
 import { sessionHandler } from "./session.js";
 import auth from "./auth.js";
 import cookieParser from 'cookie-parser';
-import { db as userDb } from "./db.js";
-
-const db = new DatabaseSync("cards.db");
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS cards (
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id   INTEGER NOT NULL,
-    name      VARCHAR NOT NULL,
-    attribute VARCHAR,
-    level     INTEGER,
-    type      VARCHAR,
-    atk       VARCHAR,
-    def       VARCHAR,
-    quantity  INTEGER
-  );
-`);
+import { db } from "./db.js";
 
 const port = 5943;
 
@@ -31,19 +14,16 @@ app.use(express.static("public"));
 app.use(cookieParser());
 app.use(sessionHandler);
 
-
-
-
-    function requireLogin(req, res, next) {
+function requireLogin(req, res, next) {
   if (res.locals.session?.user_id == null) {
     return res.status(401).render("unauthorized", { title: "Brak dostępu" });
   }
   next();
-  }
+}
 
 app.get("/", (req, res) => {
-    res.render("main", {
-        title: "Strona Główna"
+  res.render("main", {
+    title: "Strona Główna"
   });
 });
 
@@ -55,7 +35,6 @@ app.get("/card_db", (req, res) => {
     success: null
   });
 });
-
 
 app.post("/card_db/search", async (req, res) => {
   const cardName = req.body.name;
@@ -80,14 +59,12 @@ app.post("/card_db/search", async (req, res) => {
       image: card.card_images[0].image_url
     };
 
-
-      res.render("card_db", {
-        title: "Wyszukiwarka kart",
-        card: result,
-        error: null,
-        success: null
-      });
-
+    res.render("card_db", {
+      title: "Wyszukiwarka kart",
+      card: result,
+      error: null,
+      success: null
+    });
 
   } catch (err) {
     res.render("card_db", {
@@ -101,29 +78,29 @@ app.post("/card_db/search", async (req, res) => {
 
 app.get("/owned", requireLogin, (req, res) => {
   try {
-  const cards = res.locals.user.is_admin
-    ? db.prepare(`SELECT * FROM cards ORDER BY id ASC`).all().map(card => ({
-        ...card,
-        owner: userDb.prepare("SELECT username FROM fc_users WHERE id = ?").get(card.user_id)?.username ?? "Unknown"
-      }))
-    : db.prepare(`SELECT * FROM cards WHERE user_id = ? ORDER BY id ASC`).all(res.locals.session.user_id);
+    const cards = res.locals.user.is_admin
+      ? db.prepare(`SELECT * FROM cards ORDER BY id ASC`).all().map(card => ({
+          ...card,
+          owner: db.prepare("SELECT username FROM fc_users WHERE id = ?").get(card.user_id)?.username ?? "Unknown"
+        }))
+      : db.prepare(`SELECT * FROM cards WHERE user_id = ? ORDER BY id ASC`).all(res.locals.session.user_id);
 
     res.render("owned_cards", {
       title: "Wszystkie karty",
       cards
     });
   } catch (err) {
-  console.error(err);
-  res.status(500).send("Database error: " + err.message);
+    console.error(err);
+    res.status(500).send("Database error: " + err.message);
   }
 });
 
 app.get("/owned/edit/:id", requireLogin, (req, res) => {
   const id = req.params.id;
 
-  const card = db.prepare(
-    "SELECT * FROM cards WHERE id = ? AND user_id = ?"
-  ).get(id, res.locals.session.user_id);
+  const card = res.locals.user.is_admin
+    ? db.prepare("SELECT * FROM cards WHERE id = ?").get(id)
+    : db.prepare("SELECT * FROM cards WHERE id = ? AND user_id = ?").get(id, res.locals.session.user_id);
 
   if (!card) {
     return res.redirect("/owned");
@@ -139,9 +116,11 @@ app.post("/owned/edit/:id", requireLogin, (req, res) => {
   const id = req.params.id;
   const quantity = req.body.quantity;
 
-  db.prepare(
-    "UPDATE cards SET quantity = ? WHERE id = ? AND user_id = ?"
-  ).run(quantity, id, res.locals.session.user_id);
+  if (res.locals.user.is_admin) {
+    db.prepare("UPDATE cards SET quantity = ? WHERE id = ?").run(quantity, id);
+  } else {
+    db.prepare("UPDATE cards SET quantity = ? WHERE id = ? AND user_id = ?").run(quantity, id, res.locals.session.user_id);
+  }
 
   res.redirect("/owned");
 });
@@ -149,9 +128,11 @@ app.post("/owned/edit/:id", requireLogin, (req, res) => {
 app.post("/owned/delete/:id", requireLogin, (req, res) => {
   const id = req.params.id;
 
-  db.prepare(
-    "DELETE FROM cards WHERE id = ? AND user_id = ?"
-  ).run(id, res.locals.session.user_id);
+  if (res.locals.user.is_admin) {
+    db.prepare("DELETE FROM cards WHERE id = ?").run(id);
+  } else {
+    db.prepare("DELETE FROM cards WHERE id = ? AND user_id = ?").run(id, res.locals.session.user_id);
+  }
 
   res.redirect("/owned");
 });
@@ -163,7 +144,6 @@ app.get("/owned/add", requireLogin, (req, res) => {
     success: null
   });
 });
-
 
 app.post("/card/add", requireLogin, async (req, res) => {
   const { name, quantity, redirectTo } = req.body;
@@ -195,28 +175,28 @@ app.post("/card/add", requireLogin, async (req, res) => {
     const def = card.def != null ? String(card.def) : null;
 
     const existing = db.prepare(
-  "SELECT id FROM cards WHERE name = ? AND user_id = ?"
-).get(card.name, res.locals.session.user_id);
+      "SELECT id FROM cards WHERE name = ? AND user_id = ?"
+    ).get(card.name, res.locals.session.user_id);
 
-  if (existing) {
-    db.prepare(`
-      UPDATE cards SET quantity = quantity + ? WHERE id = ? AND user_id = ?
-    `).run(Number(quantity), existing.id, res.locals.session.user_id);
-  } else {
-    db.prepare(`
-      INSERT INTO cards (user_id, name, attribute, level, type, atk, def, quantity)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      res.locals.session.user_id,
-      card.name,
-      card.attribute || null,
-      level,
-      card.race + " " + card.type,
-      atk,
-      def,
-      Number(quantity)
-    );
-  }
+    if (existing) {
+      db.prepare(`
+        UPDATE cards SET quantity = quantity + ? WHERE id = ? AND user_id = ?
+      `).run(Number(quantity), existing.id, res.locals.session.user_id);
+    } else {
+      db.prepare(`
+        INSERT INTO cards (user_id, name, attribute, level, type, atk, def, quantity)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        res.locals.session.user_id,
+        card.name,
+        card.attribute || null,
+        level,
+        card.race + " " + card.type,
+        atk,
+        def,
+        Number(quantity)
+      );
+    }
 
     return res.render(
       isCardDb ? "card_db" : "add_card",
@@ -252,7 +232,6 @@ app.post("/card/add", requireLogin, async (req, res) => {
   }
 });
 
-
 const authRouter = express.Router();
 authRouter.get("/signup", auth.signup_get);
 authRouter.post("/signup", auth.signup_post);
@@ -260,8 +239,6 @@ authRouter.get("/login", auth.login_get);
 authRouter.post("/login", auth.login_post);
 authRouter.get("/logout", auth.logout);
 app.use("/auth", authRouter);
-
-
 
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);

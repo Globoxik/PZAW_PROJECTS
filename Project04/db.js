@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import argon2 from "argon2";
 
-const db_path = "./users.db";
+const db_path = "./data.db";
 export const db = new DatabaseSync(db_path, { readBigInts: true });
 
 db.exec(`
@@ -20,6 +20,20 @@ db.exec(`
     is_admin        INTEGER DEFAULT 0,
     created_at      INTEGER
   ) STRICT;
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS cards (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id   INTEGER NOT NULL,
+    name      VARCHAR NOT NULL,
+    attribute VARCHAR,
+    level     INTEGER,
+    type      VARCHAR,
+    atk       VARCHAR,
+    def       VARCHAR,
+    quantity  INTEGER
+  );
 `);
 
 const ADMIN_USERNAME = "admin";

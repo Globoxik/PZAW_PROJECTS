@@ -1,7 +1,4 @@
-import { db as userDb } from "../db.js";
-import { DatabaseSync } from "node:sqlite";
-
-const db = new DatabaseSync("cards.db");
+import { db } from "../db.js";
 
 const cardPool = [
   ["Dark Magician", "DARK", 7, "Spellcaster Effect Monster", "2500", "2100"],
@@ -21,7 +18,7 @@ const cardPool = [
   ["Swords of Revealing Light", null, null, "Spell Card", null, null],
 ];
 
-const users = userDb.prepare("SELECT id, username FROM fc_users WHERE is_admin = 0").all();
+const users = db.prepare("SELECT id, username FROM fc_users WHERE is_admin = 0").all();
 
 if (users.length === 0) {
   console.error("No non-admin users found. Create some accounts first.");

@@ -33,4 +33,4 @@ Usuwa wszystkich użytkowników (poza administratorem) z bazy danych [users.db](
 ```bash
 npm run clear all
 ```
-Usuwa wszystkie karty jak i użytkowników (poza administratorem).
+Usuwa wszystkie karty jak i użytkowników (z administratorem).
