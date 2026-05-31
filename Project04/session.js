@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { db } from "./db.js";
 import { getUser } from "./user.js";
 
-const SESSION_COOKIE = "__Host-fisz-id";
+const SESSION_COOKIE = "fc_session";
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 const db_ops = {

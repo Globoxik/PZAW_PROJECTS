@@ -225,7 +225,7 @@ app.post("/card/add", requireLogin, async (req, res) => {
       {
         title: isCardDb ? "Wyszukiwarka kart" : "Dodaj kartę",
         card: null,
-        error: "Karta nie istenieje badź nazwa jest niepoprawna.",
+        error: "Karta nie istnieje bądź nazwa jest niepoprawna.",
         success: null
       }
     );
