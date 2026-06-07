@@ -16,7 +16,7 @@ app.use(sessionHandler);
 
 function requireLogin(req, res, next) {
   if (res.locals.session?.user_id == null) {
-    return res.status(401).render("unauthorized", { title: "Brak dostępu" });
+    return res.redirect('/auth/login?returnTo=' + encodeURIComponent(req.originalUrl));
   }
   next();
 }
@@ -114,15 +114,28 @@ app.get("/owned/edit/:id", requireLogin, (req, res) => {
 
 app.post("/owned/edit/:id", requireLogin, (req, res) => {
   const id = req.params.id;
-  const quantity = req.body.quantity;
+  const parsedQuantity = parseInt(req.body.quantity, 10);
 
-  if (res.locals.user.is_admin) {
-    db.prepare("UPDATE cards SET quantity = ? WHERE id = ?").run(quantity, id);
-  } else {
-    db.prepare("UPDATE cards SET quantity = ? WHERE id = ? AND user_id = ?").run(quantity, id, res.locals.session.user_id);
+  // Server-side validation
+  if (!Number.isInteger(parsedQuantity) || parsedQuantity < 1) {
+    return res.status(400).render("edit_card", {
+      title: "Edytuj kartę",
+      card: null,
+      error: "Ilość musi być liczbą większą od 0."
+    });
   }
 
-  res.redirect("/owned");
+  try {
+    if (res.locals.user.is_admin) {
+      db.prepare("UPDATE cards SET quantity = ? WHERE id = ?").run(parsedQuantity, id);
+    } else {
+      db.prepare("UPDATE cards SET quantity = ? WHERE id = ? AND user_id = ?").run(parsedQuantity, id, res.locals.session.user_id);
+    }
+    res.redirect("/owned");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database error: " + err.message);
+  }
 });
 
 app.post("/owned/delete/:id", requireLogin, (req, res) => {
@@ -150,9 +163,37 @@ app.post("/card/add", requireLogin, async (req, res) => {
 
   const isCardDb = redirectTo === "/card_db";
 
+  // Server-side validation
+  const trimmedName = (name || '').trim();
+  const parsedQuantity = parseInt(quantity, 10);
+
+  if (!trimmedName || trimmedName.length > 200) {
+    return res.render(
+      isCardDb ? "card_db" : "add_card",
+      {
+        title: isCardDb ? "Wyszukiwarka kart" : "Dodaj kartę",
+        card: null,
+        error: "Nazwa karty jest wymagana i nie może być dłuższa niż 200 znaków.",
+        success: null
+      }
+    );
+  }
+
+  if (!Number.isInteger(parsedQuantity) || parsedQuantity < 1) {
+    return res.render(
+      isCardDb ? "card_db" : "add_card",
+      {
+        title: isCardDb ? "Wyszukiwarka kart" : "Dodaj kartę",
+        card: null,
+        error: "Ilość musi być liczbą większą od 0.",
+        success: null
+      }
+    );
+  }
+
   try {
     const response = await fetch(
-      `https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(name)}`
+      `https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(trimmedName)}`
     );
     const json = await response.json();
 
@@ -181,7 +222,7 @@ app.post("/card/add", requireLogin, async (req, res) => {
     if (existing) {
       db.prepare(`
         UPDATE cards SET quantity = quantity + ? WHERE id = ? AND user_id = ?
-      `).run(Number(quantity), existing.id, res.locals.session.user_id);
+      `).run(parsedQuantity, existing.id, res.locals.session.user_id);
     } else {
       db.prepare(`
         INSERT INTO cards (user_id, name, attribute, level, type, atk, def, quantity)
@@ -194,7 +235,7 @@ app.post("/card/add", requireLogin, async (req, res) => {
         card.race + " " + card.type,
         atk,
         def,
-        Number(quantity)
+        parsedQuantity
       );
     }
 

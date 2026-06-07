@@ -43,7 +43,8 @@ export function login_get(req, res) {
     action: "/auth/login",
     method: "POST",
   };
-  res.render("auth_login", { title: "Logowanie", form });
+  const returnTo = req.query.returnTo || null;
+  res.render("auth_login", { title: "Logowanie", form, returnTo });
 }
 
 export async function login_post(req, res) {
@@ -64,7 +65,8 @@ export async function login_post(req, res) {
       form.errors["username"] = "Niepoprawna nazwa użytkownika lub hasło";
     } else {
       createSession(user_id, res);
-      res.redirect("/");
+      const returnTo = req.query.returnTo || req.body.returnTo || "/";
+      res.redirect(returnTo);
       return;
     }
   }

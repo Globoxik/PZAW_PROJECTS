@@ -3,7 +3,42 @@
 <main>
   <h1><%= title %></h1>
   <div>
-    <%- include("./generic.ejs", form) %>
+    <form class="form" action="<%- form.action %>" method="<%- form.method %>">
+      <% form.fields.forEach((field) => { %>
+      <div class="form-row">
+        <label for="field_<%- field.name %>"><%= field.display_name %></label>
+        <div class="form-input">
+          <input 
+            type="<%- field.type %>"
+            name="<%- field.name %>"
+            id="field_<%- field.type %>"
+            <% if (field.required) { %>
+            required
+            <% } %>
+            <% if (field.min_length) { %>
+            minlength="<%- field.min_length %>"
+            <% } %>
+            <% if (field.max_length) { %>
+            maxlength="<%- field.max_length %>"
+            <% } %>
+            <% if (form.data[field.name]) { %>
+            value="<%= form.data[field.name] %>"
+            <% } %>
+          />
+          <% if (form.errors[field.name]) { %>
+            <span class="form-error"><%= form.errors[field.name] %></span>
+          <% } %>
+        </div>
+      </div>
+      <% }) %>
+      <% if (returnTo) { %>
+        <input type="hidden" name="returnTo" value="<%= returnTo %>" />
+      <% } %>
+      <div class="form-row">
+        <label></label>
+        <button class="submit-button">Zaloguj się</button>
+      </div>
+    </form>
   </div>
   <span>Nie masz konta? <a href="/auth/signup">Zarejestruj się!</a></span>
 </main>
