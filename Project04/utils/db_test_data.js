@@ -18,7 +18,7 @@ const cardPool = [
   ["Swords of Revealing Light", null, null, "Spell Card", null, null],
 ];
 
-const users = db.prepare("SELECT id, username FROM fc_users WHERE is_admin = 0").all();
+const users = db.prepare("SELECT id, username FROM users WHERE is_admin = 0").all();
 
 if (users.length === 0) {
   console.error("No non-admin users found. Create some accounts first.");

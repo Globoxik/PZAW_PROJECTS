@@ -5,16 +5,16 @@ import { db } from "./db.js";
 
 const db_ops = {
   create_user: db.prepare(
-    "INSERT INTO fc_users (username, passhash, created_at) VALUES (?, ?, ?);",
+    "INSERT INTO users (username, passhash, created_at) VALUES (?, ?, ?);",
   ),
   get_user: db.prepare(
-    "SELECT id, username, is_admin, created_at FROM fc_users WHERE id = ?;",
+    "SELECT id, username, is_admin, created_at FROM users WHERE id = ?;",
   ),
   find_by_username: db.prepare(
-    "SELECT id, username, created_at FROM fc_users WHERE username = ?;",
+    "SELECT id, username, created_at FROM users WHERE username = ?;",
   ),
   get_auth_data: db.prepare(
-    "SELECT id, passhash FROM fc_users WHERE username = ?;",
+    "SELECT id, passhash FROM users WHERE username = ?;",
   ),
   last_insert_id: db.prepare("SELECT last_insert_rowid() as id;"),
 };

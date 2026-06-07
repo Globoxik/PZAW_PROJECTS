@@ -81,7 +81,7 @@ app.get("/owned", requireLogin, (req, res) => {
     const cards = res.locals.user.is_admin
       ? db.prepare(`SELECT * FROM cards ORDER BY id ASC`).all().map(card => ({
           ...card,
-          owner: db.prepare("SELECT username FROM fc_users WHERE id = ?").get(card.user_id)?.username ?? "Unknown"
+          owner: db.prepare("SELECT username FROM users WHERE id = ?").get(card.user_id)?.username ?? "Unknown"
         }))
       : db.prepare(`SELECT * FROM cards WHERE user_id = ? ORDER BY id ASC`).all(res.locals.session.user_id);
 

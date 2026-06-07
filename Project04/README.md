@@ -28,7 +28,7 @@ Usuwa wszystkie karty z tabeli cards.
 ```bash
 npm run clear users
 ```
-Usuwa wszystkich użytkowników (poza administratorem) z tabeli fc_users.
+Usuwa wszystkich użytkowników (poza administratorem) z tabeli users.
 
 ```bash
 npm run clear all

@@ -3,18 +3,18 @@ import { randomBytes } from "node:crypto";
 import { db } from "./db.js";
 import { getUser } from "./user.js";
 
-const SESSION_COOKIE = "fc_session";
+const SESSION_COOKIE = "session";
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 const db_ops = {
   create_session: db.prepare(
-    `INSERT INTO fc_session (id, user_id, created_at)
+    `INSERT INTO session (id, user_id, created_at)
             VALUES (?, ?, ?);`
   ),
   get_session: db.prepare(
-    "SELECT id, user_id, created_at from fc_session WHERE id = ?;"
+    "SELECT id, user_id, created_at from session WHERE id = ?;"
   ),
-  delete_session: db.prepare("DELETE FROM fc_session WHERE id = ?;"),
+  delete_session: db.prepare("DELETE FROM session WHERE id = ?;"),
 };
 
 function createSession(user, res) {
