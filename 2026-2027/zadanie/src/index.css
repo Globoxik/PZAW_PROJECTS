@@ -1,0 +1,77 @@
+.film-container
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.book-container
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.album-container
+{
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.films {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.books {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.albums {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+
+.border {
+    border: 1px solid black;
+    padding: 10px;
+    margin: 10px;
+    width: fit-content;
+    text-align: center;
+}
+
+.book-img{
+    width: 200px;
+    height: 300px;
+}
+
+.film-img{
+    width: 200px;
+    height: 300px;
+}
+
+.album-img{
+    width: 250px;
+    height: 250px;
+}
+
+.track-list {
+    font-size: 18px;
+    font-weight: bold;
+    max-width: 350px;
+    max-height: 200px;
+    overflow-y: scroll;
+}
