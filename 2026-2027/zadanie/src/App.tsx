@@ -52,6 +52,79 @@ interface TrackProps {
   length: string
 }
 
+var movies:FilmProps[] = 
+[
+  {poster:"StarWars.jpg", title:"Star Wars: Zemsta Sithów", releaseYear:2005},
+  {poster:"ChlopakiNiePlacza.jpg", title:"Chłopaki nie płaczą", releaseYear:2000},
+  {poster:"Lalka.jpg", title:"Lalka", releaseYear:2026},
+]
+
+var books:BookProps[] =
+[
+  {cover:"Chlopi.jpg", title:"Chłopi", releaseYear:1904, pages:350},
+  {cover:"Dziady.jpg", title:"Dziady", releaseYear:1822, pages:600},
+  {cover:"ZbrodniaKara.jpg", title:"Zbrodnia i kara", releaseYear:1866, pages:500},
+  
+]
+
+var albums:AlbumProps[] =
+[
+  {
+    cover:"LinkinPark.jpg",
+    title:"Minutes to Midnight",
+    artist:"Linkin Park",
+    genre:"Rock",
+    releaseYear:2007,
+    tracks:[
+      { name: "Wake", length: "1:40" },
+      { name: "Given Up", length: "3:09" },
+      { name: "Leave Out All the Rest", length: "3:29" },
+      { name: "Bleed It Out", length: "2:44" },
+      { name: "Shadow of the Day", length: "4:49" },
+      { name: "What I've Done", length: "3:25" },
+      { name: "Hands Held High", length: "3:53" },
+      { name: "No More Sorrow", length: "3:41" },
+      { name: "Valentine's Day", length: "3:16" },
+      { name: "In Between", length: "3:16" },
+      { name: "In Pieces", length: "3:38" },
+      { name: "The Little Things Give You Away", length: "6:23" },
+        ],
+  },
+
+  {
+        cover:"Eminem.jpg",
+        title:"The Eminem Show",
+        artist:"Eminem",
+        genre:"hip-hop",
+        releaseYear:2002,
+        tracks:[
+          { name: "Curtains Up (Skit)", length: "0:29" },
+          { name: "White America", length: "5:24" },
+          { name: "Business", length: "4:11" },
+          { name: "Cleanin' Out My Closet", length: "4:57" },
+          { name: "Square Dance", length: "5:23" },
+          { name: "The Kiss (Skit)", length: "1:15" },
+          { name: "Soldier", length: "3:46" },
+          { name: "Say Goodbye Hollywood", length: "4:32" },
+          { name: "Drips", length: "4:45" },
+          { name: "Without Me", length: "4:50" },
+          { name: "Paul Rosenberg (Skit)", length: "0:22" },
+          { name: "Sing for the Moment", length: "5:39" },
+          { name: "Superman", length: "5:50" },
+          { name: "Hailie's Song", length: "5:20" },
+          { name: "Steve Berman (Skit)", length: "0:33" },
+          { name: "When the Music Stops", length: "4:29" },
+          { name: "Say What You Say", length: "5:09" },
+          { name: "'Till I Collapse", length: "4:57" },
+          { name: "My Dad's Gone Crazy", length: "4:27" },
+          { name: "Curtains Close (Skit)", length: "1:01" },
+        ]
+  },
+
+  
+]
+
+
 
 function Film({poster, title, releaseYear}: FilmProps) {
   return (
@@ -109,9 +182,9 @@ function App() {
 
       <section className="films">
 
-        <Film poster="StarWars.jpg" title="Star Wars: Zemsta Sithów" releaseYear={2005} />
-        <Film poster="ChlopakiNiePlacza.jpg" title="Chłopaki nie płaczą" releaseYear={2000} />
-        <Film poster="Lalka.jpg" title="Lalka" releaseYear={2026} />
+      {movies.map((movie,index) => (
+        <Film key={index} poster={movie.poster} title={movie.title} releaseYear={movie.releaseYear} />
+      ))}
 
       </section>
     </section>
@@ -121,9 +194,9 @@ function App() {
 
       <section className="books">
 
-        <Book cover="Chlopi.jpg" title="Chłopi" releaseYear={1904} pages={350} />
-        <Book cover="Dziady.jpg" title="Dziady" releaseYear={1822} pages={600} />
-        <Book cover="ZbrodniaKara.jpg" title="Zbrodnia i kara" releaseYear={1866} pages={500} />
+      {books.map((book,index) => (
+        <Book key={index} cover={book.cover} title={book.title} releaseYear={book.releaseYear} pages={book.pages} />
+      ))}
 
       </section>
     </section>
@@ -132,56 +205,11 @@ function App() {
       <b style={{ fontSize: '30px' }}>Albumy</b>
 
       <section className="albums">
-      <Album
-        cover="LinkinPark.jpg"
-        title="Minutes to Midnight"
-        artist="Linkin Park"
-        genre="Rock"
-        releaseYear={2007}
-        tracks={[
-          { name: "Wake", length: "1:40" },
-          { name: "Given Up", length: "3:09" },
-          { name: "Leave Out All the Rest", length: "3:29" },
-          { name: "Bleed It Out", length: "2:44" },
-          { name: "Shadow of the Day", length: "4:49" },
-          { name: "What I've Done", length: "3:25" },
-          { name: "Hands Held High", length: "3:53" },
-          { name: "No More Sorrow", length: "3:41" },
-          { name: "Valentine's Day", length: "3:16" },
-          { name: "In Between", length: "3:16" },
-          { name: "In Pieces", length: "3:38" },
-          { name: "The Little Things Give You Away", length: "6:23" },
-        ]}
-      />
-      <Album
-        cover="Eminem.jpg"
-        title="The Eminem Show"
-        artist="Eminem"
-        genre="hip-hop"
-        releaseYear={2002}
-        tracks={[
-          { name: "Curtains Up (Skit)", length: "0:29" },
-          { name: "White America", length: "5:24" },
-          { name: "Business", length: "4:11" },
-          { name: "Cleanin' Out My Closet", length: "4:57" },
-          { name: "Square Dance", length: "5:23" },
-          { name: "The Kiss (Skit)", length: "1:15" },
-          { name: "Soldier", length: "3:46" },
-          { name: "Say Goodbye Hollywood", length: "4:32" },
-          { name: "Drips", length: "4:45" },
-          { name: "Without Me", length: "4:50" },
-          { name: "Paul Rosenberg (Skit)", length: "0:22" },
-          { name: "Sing for the Moment", length: "5:39" },
-          { name: "Superman", length: "5:50" },
-          { name: "Hailie's Song", length: "5:20" },
-          { name: "Steve Berman (Skit)", length: "0:33" },
-          { name: "When the Music Stops", length: "4:29" },
-          { name: "Say What You Say", length: "5:09" },
-          { name: "'Till I Collapse", length: "4:57" },
-          { name: "My Dad's Gone Crazy", length: "4:27" },
-          { name: "Curtains Close (Skit)", length: "1:01" },
-        ]}
-      />
+
+      {albums.map((album,index) => (
+        <Album key={index} cover={album.cover} title={album.title} artist={album.artist} genre={album.genre} releaseYear={album.releaseYear} tracks={album.tracks} />
+      ))}
+
       </section>
     </section>
 
