@@ -46,6 +46,9 @@
 
 
 .border {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     border: 1px solid black;
     padding: 10px;
     margin: 10px;
@@ -56,6 +59,7 @@
 .book-img{
     width: 200px;
     height: 300px;
+
 }
 
 .film-img{
@@ -73,5 +77,23 @@
     font-weight: bold;
     max-width: 350px;
     max-height: 200px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.track-list.empty {
+    list-style: none;
+    padding-left: 0;
+    text-align: center;
+    overflow-y: hidden;
+}
+
+.rec {
+    font-size: 30px;
+    height: 36px;
+    padding-bottom: 10px;
+}
+
+.artist {
+    font-size: 25px;
 }

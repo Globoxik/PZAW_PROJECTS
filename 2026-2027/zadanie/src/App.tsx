@@ -6,7 +6,7 @@ interface FilmProps {
   title: string;
 
   // rok wydania filmu w typie number
-  releaseYear:number;
+  releaseYear: number;
 
   // ocena filmu w typie number
   rating: number;
@@ -81,10 +81,10 @@ interface AlbumProps {
 
 interface TrackProps {
   // nazwa utworu w typie string
-  name: string
+  name?: string;
 
   // długość utworu w typie string
-  length: string
+  length?: string;
 }
 
 var albums:AlbumProps[] =
@@ -141,18 +141,28 @@ var albums:AlbumProps[] =
         ]
   },
 
+    {
+        cover:"Skillet.jpg",
+        title:"Awake",
+        artist:"Skillet",
+        genre:"rock",
+        releaseYear:2009,
+        tracks:[]
+  },
+
   
 ]
 
-const maxTracks = Math.max(...albums.map(album => album.tracks.length));
-
 const biggestAlbum = albums.filter(
-  album => album.tracks.length === maxTracks
+  album => album.tracks.length === Math.max(...albums.map(album => album.tracks.length))
 );
 
 function Film({poster, title, releaseYear, rating}: FilmProps) {
   return (
     <div className="border">
+      <b className="rec">
+        {rating >= 8 ? "Polecane" : ""}
+      </b>
       <img className="film-img" src={poster} alt={title} />
       <h2>{title}</h2>
       <p style={{ color: 'grey' }}>{releaseYear}</p>
@@ -164,6 +174,9 @@ function Film({poster, title, releaseYear, rating}: FilmProps) {
 function Book({cover, title, releaseYear, pages}: BookProps) {
   return(
     <div className="border">
+      <b className="rec">
+        {releaseYear < 2000 ? "Klasyka" : ""}
+      </b>
       <img className="book-img"src={cover} alt={title} />
       <h2>{title}</h2>
       <h3>{pages} stron</h3>
@@ -182,16 +195,22 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
   return (
     <div className="border">
       <img className="album-img"src={cover} alt={title} />
-      <h2>{artist}, {title}</h2>
+      <h2>{title}</h2>
+      <b className="artist">{artist}</b>
       <h3>{genre}</h3>
       <p style={{ color: 'grey' }}>{releaseYear}</p>
       <div className="tracks">
-        {/* AI nie zostało użyte do stworzenia pętli, informacja o implementacji pozyskana z dokumentacji Reacta: https://react.dev/learn/rendering-lists */}
-        <ol className="track-list">
-        {tracks.map((track, index) => (
-          <li><Track key={index} {...track} /></li>
-        ))}
-        </ol>
+      <ol className={`track-list ${tracks.length === 0 ? "empty" : ""}`}>
+        {tracks.length === 0 ? (
+          <li>Brak utworów</li>
+        ) : (
+          tracks.map((track, index) => (
+            <li key={index}>
+              <Track {...track} />
+            </li>
+          ))
+        )}
+      </ol>
       </div>
     </div>  
   );
@@ -214,6 +233,8 @@ function App() {
       </section>
     </section>
 
+    <br/>
+
     <section className="book-container">
       <b style={{ fontSize: '30px' }}>Książki</b>
 
@@ -226,6 +247,8 @@ function App() {
       </section>
     </section>
 
+    <br/>
+
     <section className="album-container">
       <b style={{ fontSize: '30px' }}>Albumy</b>
 
@@ -237,6 +260,8 @@ function App() {
 
       </section>
     </section>
+    
+    <br/>
 
     <section className="film-container">
         <b style={{ fontSize: '30px' }}>Filmy wydane po 2010</b>
@@ -250,6 +275,8 @@ function App() {
       </section>
     </section>
 
+    <br/>
+
     <section className="book-container">
       <b style={{ fontSize: '30px' }}>Książki posortowane według roku wydania</b>
 
@@ -261,6 +288,8 @@ function App() {
       </section>
     </section>
 
+    <br/>
+    
     <section className="album-container">
       <b style={{ fontSize: '30px' }}>Album z największą liczbą utworów</b>
 
