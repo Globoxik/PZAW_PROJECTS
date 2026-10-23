@@ -7,7 +7,32 @@ interface FilmProps {
 
   // rok wydania filmu w typie number
   releaseYear:number;
+
+  // ocena filmu w typie number
+  rating: number;
 }
+
+var movies:FilmProps[] = 
+[
+  {poster:"StarWars.jpg", title:"Star Wars: Zemsta Sithów", releaseYear:2005, rating:9},
+  {poster:"ChlopakiNiePlacza.jpg", title:"Chłopaki nie płaczą", releaseYear:2000, rating:10},
+  {poster:"Lalka.jpg", title:"Lalka", releaseYear:2026, rating:5},
+]
+
+movies.sort((a,b) => {
+  const titleA = a.title.toUpperCase();
+  const titleB = b.title.toUpperCase(); 
+  if (titleA < titleB) {
+    return -1;
+  }
+  if (titleA > titleB) {
+    return 1;
+  }
+
+  return 0;
+});
+
+const newMovies:FilmProps[] = movies.filter(movie => movie.releaseYear >= 2010);
 
 interface BookProps {
   // cover zawiera scieżke w typie string do pliku ze zdjeciem w folderze public
@@ -22,6 +47,16 @@ interface BookProps {
   // liczba stron książki w typie number
   pages: number;
 }
+
+var books:BookProps[] =
+[
+  {cover:"Chlopi.jpg", title:"Chłopi", releaseYear:1904, pages:350},
+  {cover:"Dziady.jpg", title:"Dziady", releaseYear:1822, pages:600},
+  {cover:"ZbrodniaKara.jpg", title:"Zbrodnia i kara", releaseYear:1866, pages:500},
+  
+]
+
+const sortedBooks:BookProps[] = [...books].sort((a,b) => b.releaseYear - a.releaseYear);
 
 interface AlbumProps {
   //
@@ -51,21 +86,6 @@ interface TrackProps {
   // długość utworu w typie string
   length: string
 }
-
-var movies:FilmProps[] = 
-[
-  {poster:"StarWars.jpg", title:"Star Wars: Zemsta Sithów", releaseYear:2005},
-  {poster:"ChlopakiNiePlacza.jpg", title:"Chłopaki nie płaczą", releaseYear:2000},
-  {poster:"Lalka.jpg", title:"Lalka", releaseYear:2026},
-]
-
-var books:BookProps[] =
-[
-  {cover:"Chlopi.jpg", title:"Chłopi", releaseYear:1904, pages:350},
-  {cover:"Dziady.jpg", title:"Dziady", releaseYear:1822, pages:600},
-  {cover:"ZbrodniaKara.jpg", title:"Zbrodnia i kara", releaseYear:1866, pages:500},
-  
-]
 
 var albums:AlbumProps[] =
 [
@@ -124,14 +144,19 @@ var albums:AlbumProps[] =
   
 ]
 
+const maxTracks = Math.max(...albums.map(album => album.tracks.length));
 
+const biggestAlbum = albums.filter(
+  album => album.tracks.length === maxTracks
+);
 
-function Film({poster, title, releaseYear}: FilmProps) {
+function Film({poster, title, releaseYear, rating}: FilmProps) {
   return (
     <div className="border">
       <img className="film-img" src={poster} alt={title} />
       <h2>{title}</h2>
       <p style={{ color: 'grey' }}>{releaseYear}</p>
+      <p>Ocena: {rating}/10</p>
     </div>
   );
 }
@@ -164,7 +189,7 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
         {/* AI nie zostało użyte do stworzenia pętli, informacja o implementacji pozyskana z dokumentacji Reacta: https://react.dev/learn/rendering-lists */}
         <ol className="track-list">
         {tracks.map((track, index) => (
-          <li><Track key={index} name={track.name} length={track.length} /></li>
+          <li><Track key={index} {...track} /></li>
         ))}
         </ol>
       </div>
@@ -183,7 +208,7 @@ function App() {
       <section className="films">
 
       {movies.map((movie,index) => (
-        <Film key={index} poster={movie.poster} title={movie.title} releaseYear={movie.releaseYear} />
+        <Film key={index} {...movie} />
       ))}
 
       </section>
@@ -195,7 +220,7 @@ function App() {
       <section className="books">
 
       {books.map((book,index) => (
-        <Book key={index} cover={book.cover} title={book.title} releaseYear={book.releaseYear} pages={book.pages} />
+        <Book key={index} {...book} />
       ))}
 
       </section>
@@ -207,12 +232,46 @@ function App() {
       <section className="albums">
 
       {albums.map((album,index) => (
-        <Album key={index} cover={album.cover} title={album.title} artist={album.artist} genre={album.genre} releaseYear={album.releaseYear} tracks={album.tracks} />
+        <Album key={index} {...album} />
       ))}
 
       </section>
     </section>
 
+    <section className="film-container">
+        <b style={{ fontSize: '30px' }}>Filmy wydane po 2010</b>
+
+      <section className="films">
+
+      {newMovies.map((newMovie,index) => (
+        <Film key={index} {...newMovie} />
+      ))}
+
+      </section>
+    </section>
+
+    <section className="book-container">
+      <b style={{ fontSize: '30px' }}>Książki posortowane według roku wydania</b>
+
+      <section className="books">
+      {sortedBooks.map((book,index) => (
+        <Book key={index} {...book} />
+      ))}
+
+      </section>
+    </section>
+
+    <section className="album-container">
+      <b style={{ fontSize: '30px' }}>Album z największą liczbą utworów</b>
+
+      <section className="albums">
+
+      {biggestAlbum.map((album,index) => (
+        <Album key={index} {...album} />
+      ))}
+
+      </section>
+    </section>
     </>
   )
 }
