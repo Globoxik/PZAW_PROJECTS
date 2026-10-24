@@ -1,3 +1,5 @@
+import {useState} from 'react';
+
 interface FilmProps {
   // poster zawiera scieżke w typie string do pliku ze zdjeciem w folderze public
   poster: string;
@@ -34,6 +36,11 @@ movies.sort((a,b) => {
 
 const newMovies:FilmProps[] = movies.filter(movie => movie.releaseYear >= 2010);
 
+interface FilmContainerProps {
+  // czy wyświetlać tylko nowe filmy
+  newerMovies: boolean;
+}
+
 interface BookProps {
   // cover zawiera scieżke w typie string do pliku ze zdjeciem w folderze public
   cover: string;
@@ -46,6 +53,11 @@ interface BookProps {
 
   // liczba stron książki w typie number
   pages: number;
+}
+
+interface BookContainerProps {
+  //czy wyświetlać posortowane książki
+  sorted: boolean;
 }
 
 var books:BookProps[] =
@@ -77,6 +89,11 @@ interface AlbumProps {
   // lista utworów w typie TrackProps[]
   tracks: TrackProps[];
 
+}
+
+interface AlbumContainerProps {
+  // czy wyświetlac album o największej liczbie utworów
+  biggest: boolean;
 }
 
 interface TrackProps {
@@ -171,6 +188,28 @@ function Film({poster, title, releaseYear, rating}: FilmProps) {
   );
 }
 
+function FilmContainer({newerMovies}: FilmContainerProps) {
+  const [showFilms, setShowFilms] = useState(true);
+  return (
+    <section className="film-container">
+      <b style={{ fontSize: '30px' }} onClick={() => setShowFilms(!showFilms)}>{newerMovies ? (showFilms ? "Filmy wydane po 2010⏷" : "Filmy wydane po 2010⏵") : (showFilms ? "Filmy⏷" : "Filmy⏵")}</b>
+
+      {showFilms && (
+        <section className="films">
+      {newerMovies 
+      ?  newMovies.map((newMovie,index) => (
+        <Film key={index} {...newMovie} />
+      ))
+      
+      : movies.map((movie,index) => (
+        <Film key={index} {...movie} />
+      ))}
+
+      </section>)}
+    </section>
+  );
+}
+
 function Book({cover, title, releaseYear, pages}: BookProps) {
   return(
     <div className="border">
@@ -185,6 +224,29 @@ function Book({cover, title, releaseYear, pages}: BookProps) {
   );
 }
 
+function BookContainer({sorted}: BookContainerProps) {
+  const [showBooks, setShowBooks] = useState(true);
+  return (
+      <section className="book-container">
+      <b style={{ fontSize: '30px' }} onClick={() => setShowBooks(!showBooks)}>{sorted ? (showBooks ? "Książki posortowane według roku wydania⏷" : "Książki posortowane według roku wydania⏵") : (showBooks ? "Książki⏷" : "Książki⏵")}</b>
+
+      {showBooks && (
+        <section className="books">
+
+      {sorted
+      ? sortedBooks.map((book,index) => (
+        <Book key={index} {...book} />
+      ))
+
+      : books.map((book,index) => (
+        <Book key={index} {...book} />
+      ))}
+
+      </section>)}
+    </section>
+  );
+}
+
 function Track({name, length}: TrackProps) {
   return (
       <p>{name} - {length}</p>
@@ -193,7 +255,7 @@ function Track({name, length}: TrackProps) {
 
 function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
   return (
-    <div className="border">
+    <div className="border album-card">
       <img className="album-img"src={cover} alt={title} />
       <h2>{title}</h2>
       <b className="artist">{artist}</b>
@@ -216,91 +278,46 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
   );
 }
 
+function AlbumContainer({biggest}: AlbumContainerProps) {
+  const [showAlbums, setShowAlbums] = useState(true);
+  return(
+      <section className="album-container">
+      <b style={{ fontSize: '30px' }} onClick={() => setShowAlbums(!showAlbums)}>{biggest ? (showAlbums ? "Album z największą liczbą utworów⏷" : "Album z największą liczbą utworów⏵") :(showAlbums ? "Albumy⏷" : "Albumy⏵")}</b>
+
+      {showAlbums && (
+        <section className="albums">
+
+      {biggest
+      ? biggestAlbum.map((album,index) => (
+        <Album key={index} {...album} />
+      ))
+
+      : albums.map((album,index) => (
+        <Album key={index} {...album} />
+      ))}
+
+      </section>)}
+    </section>
+  );
+}
+
+
 
 function App() {
-
   return (
     <>
-    <section className="film-container">
-      <b style={{ fontSize: '30px' }}>Filmy</b>
-
-      <section className="films">
-
-      {movies.map((movie,index) => (
-        <Film key={index} {...movie} />
-      ))}
-
-      </section>
-    </section>
-
-    <br/>
-
-    <section className="book-container">
-      <b style={{ fontSize: '30px' }}>Książki</b>
-
-      <section className="books">
-
-      {books.map((book,index) => (
-        <Book key={index} {...book} />
-      ))}
-
-      </section>
-    </section>
-
-    <br/>
-
-    <section className="album-container">
-      <b style={{ fontSize: '30px' }}>Albumy</b>
-
-      <section className="albums">
-
-      {albums.map((album,index) => (
-        <Album key={index} {...album} />
-      ))}
-
-      </section>
-    </section>
     
-    <br/>
-
-    <section className="film-container">
-        <b style={{ fontSize: '30px' }}>Filmy wydane po 2010</b>
-
-      <section className="films">
-
-      {newMovies.map((newMovie,index) => (
-        <Film key={index} {...newMovie} />
-      ))}
-
-      </section>
-    </section>
-
-    <br/>
-
-    <section className="book-container">
-      <b style={{ fontSize: '30px' }}>Książki posortowane według roku wydania</b>
-
-      <section className="books">
-      {sortedBooks.map((book,index) => (
-        <Book key={index} {...book} />
-      ))}
-
-      </section>
-    </section>
-
-    <br/>
-    
-    <section className="album-container">
-      <b style={{ fontSize: '30px' }}>Album z największą liczbą utworów</b>
-
-      <section className="albums">
-
-      {biggestAlbum.map((album,index) => (
-        <Album key={index} {...album} />
-      ))}
-
-      </section>
-    </section>
+    <FilmContainer newerMovies={false} />
+    <br />
+    <BookContainer sorted={false} />
+    <br />
+    <AlbumContainer biggest={false} />
+    <br />
+    <FilmContainer newerMovies={true} />
+    <br />
+    <BookContainer sorted={true} />
+    <br />
+    <AlbumContainer biggest={true} />
     </>
   )
 }
