@@ -176,14 +176,14 @@ const biggestAlbum = albums.filter(
 
 function Film({poster, title, releaseYear, rating}: FilmProps) {
   return (
-    <div className="border">
-      <b className="rec">
-        {rating >= 8 ? "Polecane" : ""}
-      </b>
-      <img className="film-img" src={poster} alt={title} />
-      <h2>{title}</h2>
-      <p style={{ color: 'grey' }}>{releaseYear}</p>
-      <p>Ocena: {rating}/10</p>
+    <div className="border-5 card text-bg-dark text-center h-100">
+      <img src={poster} className="card-img-top" alt={title} />
+      <div className="card-body">
+      <b className="card-text">{rating >= 8 ? "Polecane" : ""}</b>
+      <h2 className="card-title">{title}</h2>
+      <p className="card-text">{releaseYear}</p>
+      <p className="card-text">Ocena: {rating}/10</p>
+      </div>
     </div>
   );
 }
@@ -191,35 +191,28 @@ function Film({poster, title, releaseYear, rating}: FilmProps) {
 function FilmContainer({newerMovies}: FilmContainerProps) {
   const [showFilms, setShowFilms] = useState(true);
   return (
-    <section className="film-container">
-      <b style={{ fontSize: '30px' }} onClick={() => setShowFilms(!showFilms)}>{newerMovies ? (showFilms ? "Filmy wydane po 2010⏷" : "Filmy wydane po 2010⏵") : (showFilms ? "Filmy⏷" : "Filmy⏵")}</b>
-
+    <div className="mb-4">
+      <b onClick={() => setShowFilms(!showFilms)}>{newerMovies ? (showFilms ? "Filmy wydane po 2010⏷" : "Filmy wydane po 2010⏵") : (showFilms ? "Filmy⏷" : "Filmy⏵")}</b>
       {showFilms && (
-        <section className="films">
-      {newerMovies 
-      ?  newMovies.map((newMovie,index) => (
-        <Film key={index} {...newMovie} />
-      ))
-      
-      : movies.map((movie,index) => (
-        <Film key={index} {...movie} />
-      ))}
-
-      </section>)}
-    </section>
+        <div className="row g-3 mt-1">
+      {(newerMovies ? newMovies : movies).map((movie,index) => (
+        <div className="col-12 col-md-6 col-lg-4" key={index}>
+          <Film {...movie} />
+        </div>
+       ))}
+      </div>)}
+    </div>
   );
 }
 
 function Book({cover, title, releaseYear, pages}: BookProps) {
   return(
-    <div className="border">
-      <b className="rec">
-        {releaseYear < 2000 ? "Klasyka" : ""}
-      </b>
-      <img className="book-img"src={cover} alt={title} />
-      <h2>{title}</h2>
-      <h3>{pages} stron</h3>
-      <p style={{ color: 'grey' }}>{releaseYear}</p>
+    <div className="border-5 card text-bg-dark text-center">
+      <img src={cover} className="card-img-top" alt={title} />
+      <b className="card-text">{releaseYear < 2000 ? "Klasyka" : ""}</b>
+      <h2 className="card-title">{title}</h2>
+      <h3 className="card-text">{pages} stron</h3>
+      <p className="card-text">{releaseYear}</p>
     </div>
   );
 }
@@ -227,53 +220,67 @@ function Book({cover, title, releaseYear, pages}: BookProps) {
 function BookContainer({sorted}: BookContainerProps) {
   const [showBooks, setShowBooks] = useState(true);
   return (
-      <section className="book-container">
-      <b style={{ fontSize: '30px' }} onClick={() => setShowBooks(!showBooks)}>{sorted ? (showBooks ? "Książki posortowane według roku wydania⏷" : "Książki posortowane według roku wydania⏵") : (showBooks ? "Książki⏷" : "Książki⏵")}</b>
+      <div>
+      <b onClick={() => setShowBooks(!showBooks)}>{sorted ? (showBooks ? "Książki posortowane według roku wydania⏷" : "Książki posortowane według roku wydania⏵") : (showBooks ? "Książki⏷" : "Książki⏵")}</b>
 
       {showBooks && (
-        <section className="books">
-
-      {sorted
-      ? sortedBooks.map((book,index) => (
-        <Book key={index} {...book} />
-      ))
-
-      : books.map((book,index) => (
-        <Book key={index} {...book} />
+      <div className="row g-3 mt-1">
+      {(sorted ? sortedBooks : books).map((book,index) => (
+        <div className="col-12 col-md-6 col-lg-4" key={index}>
+          <Book key={index} {...book} />
+        </div>
       ))}
 
-      </section>)}
-    </section>
+      </div>)}
+    </div>
   );
 }
 
 function Track({name, length}: TrackProps) {
   return (
-      <p>{name} - {length}</p>
+      <>
+      <td className="text-start">{name}</td>
+      <td className="text-end">{length}</td>
+      </>
     );
   }
 
 function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
   return (
-    <div className="border album-card">
-      <img className="album-img"src={cover} alt={title} />
-      <h2>{title}</h2>
-      <b className="artist">{artist}</b>
-      <h3>{genre}</h3>
-      <p style={{ color: 'grey' }}>{releaseYear}</p>
-      <div className="tracks">
-      <ol className={`track-list ${tracks.length === 0 ? "empty" : ""}`}>
-        {tracks.length === 0 ? (
-          <li>Brak utworów</li>
-        ) : (
-          tracks.map((track, index) => (
-            <li key={index}>
-              <Track {...track} />
-            </li>
-          ))
-        )}
-      </ol>
+    <div className="border-5 card text-bg-dark text-center">
+      <img className="card-img-top" src={cover} alt={title} />
+      <h2 className="card-">{title}</h2>
+      <b className="card-text">{artist}</b>
+      <h3 className="card-text">{genre}</h3>
+      <p className="card-text">{releaseYear}</p>
+      {tracks.length === 0 
+      ?(
+      <div className="alert alert-dark" role="alert">
+        Brak utworów w albumie
       </div>
+      )
+     :(
+      <div className="table-responsive" style={{ maxHeight: "300px", overflowY: "auto" }}>
+      <table className="table  table-dark table-striped table-hover">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col" className="text-start">Nazwa</th>
+          <th scope="col" className="text-end">Długość</th>
+        </tr>
+        </thead>
+        <tbody>
+          {tracks.map((track, index) => (
+              <tr>
+                <th scope="row" key={index}>{index}</th>
+                <Track {...track}/>
+              </tr>
+          ))}
+        </tbody>
+      </table>
+      </div>
+      )}
+
     </div>  
   );
 }
@@ -281,44 +288,30 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
 function AlbumContainer({biggest}: AlbumContainerProps) {
   const [showAlbums, setShowAlbums] = useState(true);
   return(
-      <section className="album-container">
-      <b style={{ fontSize: '30px' }} onClick={() => setShowAlbums(!showAlbums)}>{biggest ? (showAlbums ? "Album z największą liczbą utworów⏷" : "Album z największą liczbą utworów⏵") :(showAlbums ? "Albumy⏷" : "Albumy⏵")}</b>
-
+      <div>
+      <b onClick={() => setShowAlbums(!showAlbums)}>{biggest ? (showAlbums ? "Album z największą liczbą utworów⏷" : "Album z największą liczbą utworów⏵") :(showAlbums ? "Albumy⏷" : "Albumy⏵")}</b>
       {showAlbums && (
-        <section className="albums">
-
-      {biggest
-      ? biggestAlbum.map((album,index) => (
+      <div className="row g-3 mt-1">
+      {(biggest ? biggestAlbum : albums).map((album,index) => (
+        <div className="col-12 col-md-6 col-lg-4">
         <Album key={index} {...album} />
-      ))
-
-      : albums.map((album,index) => (
-        <Album key={index} {...album} />
+        </div>
       ))}
-
-      </section>)}
-    </section>
+      </div>)}
+    </div>
   );
 }
 
-
-
 function App() {
   return (
-    <>
-    
+    <div className="container">
     <FilmContainer newerMovies={false} />
-    <br />
     <BookContainer sorted={false} />
-    <br />
     <AlbumContainer biggest={false} />
-    <br />
     <FilmContainer newerMovies={true} />
-    <br />
     <BookContainer sorted={true} />
-    <br />
     <AlbumContainer biggest={true} />
-    </>
+    </div>
   )
 }
 
