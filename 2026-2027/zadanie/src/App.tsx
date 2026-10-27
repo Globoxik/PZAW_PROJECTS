@@ -176,13 +176,14 @@ const biggestAlbum = albums.filter(
 
 function Film({poster, title, releaseYear, rating}: FilmProps) {
   return (
-    <div className="border-5 card text-bg-dark text-center h-100">
-      <img src={poster} className="card-img-top" alt={title} />
+    <div className="border-5 card text-bg-dark text-center h-100" onClick={() => {console.log(`Wybrano film: ${title}`)}}>
+      <img src={poster} className="card-img-top" alt={title}/>
       <div className="card-body">
       <b className="card-text">{rating >= 8 ? "Polecane" : ""}</b>
       <h2 className="card-title">{title}</h2>
       <p className="card-text">{releaseYear}</p>
-      <p className="card-text">Ocena: {rating}/10</p>
+      <button className="btn btn-light" onClick={(e) => {e.stopPropagation(); console.log(`Nacisąłeś przycisk dla filmu: ${title}`)}}>Pokaż szczegóły</button>
+      <p className="card-text">Ocena: {rating}/10</p> 
       </div>
     </div>
   );
