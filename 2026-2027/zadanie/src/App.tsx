@@ -98,10 +98,10 @@ interface AlbumContainerProps {
 
 interface TrackProps {
   // nazwa utworu w typie string
-  name?: string;
+  name: string;
 
   // długość utworu w typie string
-  length?: string;
+  length: string;
 }
 
 var albums:AlbumProps[] =
@@ -191,11 +191,13 @@ function Film({poster, title, releaseYear, rating}: FilmProps) {
 
 function FilmContainer({newerMovies}: FilmContainerProps) {
   const [showFilms, setShowFilms] = useState(true);
+  const [textValue, setTextValue] = useState("");
   return (
     <div className="mb-4">
       <b onClick={() => setShowFilms(!showFilms)}>{newerMovies ? (showFilms ? "Filmy wydane po 2010⏷" : "Filmy wydane po 2010⏵") : (showFilms ? "Filmy⏷" : "Filmy⏵")}</b>
       {showFilms && (
-        <div className="row g-3 mt-1">
+      <div className="row g-3 mt-1">
+      <input id="movie-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => { setTextValue(e.target.value); console.log(e.target.value);}} />
       {(newerMovies ? newMovies : movies).map((movie,index) => (
         <div className="col-12 col-md-6 col-lg-4" key={index}>
           <Film {...movie} />
@@ -220,12 +222,14 @@ function Book({cover, title, releaseYear, pages}: BookProps) {
 
 function BookContainer({sorted}: BookContainerProps) {
   const [showBooks, setShowBooks] = useState(true);
+  const [textValue, setTextValue] = useState("");
   return (
       <div>
       <b onClick={() => setShowBooks(!showBooks)}>{sorted ? (showBooks ? "Książki posortowane według roku wydania⏷" : "Książki posortowane według roku wydania⏵") : (showBooks ? "Książki⏷" : "Książki⏵")}</b>
-
+      
       {showBooks && (
       <div className="row g-3 mt-1">
+      <input id="book-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => { setTextValue(e.target.value); console.log(e.target.value);}} />
       {(sorted ? sortedBooks : books).map((book,index) => (
         <div className="col-12 col-md-6 col-lg-4" key={index}>
           <Book key={index} {...book} />
@@ -235,6 +239,11 @@ function BookContainer({sorted}: BookContainerProps) {
       </div>)}
     </div>
   );
+}
+
+function handleSongClick(songName:string , albumName:string)
+{
+  console.log(`Wybrano utwór: ${songName} z albumu: ${albumName}`);
 }
 
 function Track({name, length}: TrackProps) {
@@ -272,9 +281,9 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
         </thead>
         <tbody>
           {tracks.map((track, index) => (
-              <tr>
-                <th scope="row" key={index}>{index}</th>
-                <Track {...track}/>
+              <tr onClick={() => {handleSongClick(track.name, title);}}>
+                <th scope="row" key={index}>{index + 1}</th>
+                <Track {...track} />
               </tr>
           ))}
         </tbody>
@@ -288,11 +297,13 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
 
 function AlbumContainer({biggest}: AlbumContainerProps) {
   const [showAlbums, setShowAlbums] = useState(true);
+  const [textValue, setTextValue] = useState("");
   return(
       <div>
       <b onClick={() => setShowAlbums(!showAlbums)}>{biggest ? (showAlbums ? "Album z największą liczbą utworów⏷" : "Album z największą liczbą utworów⏵") :(showAlbums ? "Albumy⏷" : "Albumy⏵")}</b>
       {showAlbums && (
       <div className="row g-3 mt-1">
+      <input id="album-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => { setTextValue(e.target.value); console.log(e.target.value);}} />
       {(biggest ? biggestAlbum : albums).map((album,index) => (
         <div className="col-12 col-md-6 col-lg-4">
         <Album key={index} {...album} />
