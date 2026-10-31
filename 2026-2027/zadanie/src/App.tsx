@@ -192,13 +192,17 @@ function Film({poster, title, releaseYear, rating}: FilmProps) {
 function FilmContainer({newerMovies}: FilmContainerProps) {
   const [showFilms, setShowFilms] = useState(true);
   const [textValue, setTextValue] = useState("");
+  const filteredMovies = (newerMovies ? newMovies : movies).filter(movie =>
+    movie.title.toLowerCase().includes(textValue.toLowerCase())
+  );
+
   return (
     <div className="mb-4">
       <b onClick={() => setShowFilms(!showFilms)}>{newerMovies ? (showFilms ? "Filmy wydane po 2010⏷" : "Filmy wydane po 2010⏵") : (showFilms ? "Filmy⏷" : "Filmy⏵")}</b>
       {showFilms && (
       <div className="row g-3 mt-1">
-      <input id="movie-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => { setTextValue(e.target.value); console.log(e.target.value);}} />
-      {(newerMovies ? newMovies : movies).map((movie,index) => (
+      <input id="movie-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => setTextValue(e.target.value)} />
+      {filteredMovies.map((movie,index) => (
         <div className="col-12 col-md-6 col-lg-4" key={index}>
           <Film {...movie} />
         </div>
@@ -223,14 +227,18 @@ function Book({cover, title, releaseYear, pages}: BookProps) {
 function BookContainer({sorted}: BookContainerProps) {
   const [showBooks, setShowBooks] = useState(true);
   const [textValue, setTextValue] = useState("");
+  const filteredBooks = (sorted ? sortedBooks : books).filter(book =>
+    book.title.toLowerCase().includes(textValue.toLowerCase())
+  );
+
   return (
       <div>
       <b onClick={() => setShowBooks(!showBooks)}>{sorted ? (showBooks ? "Książki posortowane według roku wydania⏷" : "Książki posortowane według roku wydania⏵") : (showBooks ? "Książki⏷" : "Książki⏵")}</b>
       
       {showBooks && (
       <div className="row g-3 mt-1">
-      <input id="book-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => { setTextValue(e.target.value); console.log(e.target.value);}} />
-      {(sorted ? sortedBooks : books).map((book,index) => (
+      <input id="book-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => setTextValue(e.target.value)} />
+      {filteredBooks.map((book,index) => (
         <div className="col-12 col-md-6 col-lg-4" key={index}>
           <Book key={index} {...book} />
         </div>
@@ -298,13 +306,17 @@ function Album({cover, title, artist, genre, releaseYear, tracks}: AlbumProps) {
 function AlbumContainer({biggest}: AlbumContainerProps) {
   const [showAlbums, setShowAlbums] = useState(true);
   const [textValue, setTextValue] = useState("");
+  const filteredAlbums = (biggest ? biggestAlbum : albums).filter(album =>
+    album.title.toLowerCase().includes(textValue.toLowerCase())
+  );
+  
   return(
       <div>
       <b onClick={() => setShowAlbums(!showAlbums)}>{biggest ? (showAlbums ? "Album z największą liczbą utworów⏷" : "Album z największą liczbą utworów⏵") :(showAlbums ? "Albumy⏷" : "Albumy⏵")}</b>
       {showAlbums && (
       <div className="row g-3 mt-1">
-      <input id="album-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => { setTextValue(e.target.value); console.log(e.target.value);}} />
-      {(biggest ? biggestAlbum : albums).map((album,index) => (
+      <input id="album-search" type="text" className="form-control" placeholder="Wpisz tytuł" onChange={(e) => setTextValue(e.target.value)} />
+      {filteredAlbums.map((album,index) => (
         <div className="col-12 col-md-6 col-lg-4">
         <Album key={index} {...album} />
         </div>
