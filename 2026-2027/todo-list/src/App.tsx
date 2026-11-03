@@ -23,6 +23,7 @@ function App() {
   
 const [text, setText] = useState("");
 const [tasks, setTasks] = useState<TaskProps[]>([]);
+//spieszyłem się wiem że pewnie jest źle :(
 let displayAll = true
 let displayDone = false
 let displayUnfinished = false
@@ -49,6 +50,7 @@ let displayUnfinished = false
       <Task key={index} {...task}/>
     )))}
     </div>
+    {/* nie wiedzialem jak zrobic zeby tez sie updatowao przy zaznaczeniu checkboxa taska */}
     <b>Pozostało {([...tasks].filter((task) => task.isChecked === false)).length} zadań do zrobienia</b>
     </>
   )
