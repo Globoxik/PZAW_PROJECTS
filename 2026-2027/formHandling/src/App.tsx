@@ -3,7 +3,7 @@ import { useState } from 'react'
 interface Data {
   name: string,
   race: string,
-  class: string,
+  classs: string,
   description: string,
   level: number,
   isPublic: boolean
@@ -50,7 +50,7 @@ function CharacterForm() {
       errors.race = "Rasa musi być wybrana"
     }
     if (data.formData.class === "") {
-      errors.class = "Klasa musi być wybrana"
+      errors.classs = "Klasa musi być wybrana"
     }
     if (data.formData.description.trim().length > 200) {
       errors.description = "Opis musi mieć poniżej 200 znaków"
@@ -63,6 +63,8 @@ function CharacterForm() {
     return errors;
   }
 
+  var cardProps:Data[] = []
+
   function handleSubmit(event) {
     event.preventDefault();
 
@@ -73,7 +75,8 @@ function CharacterForm() {
       console.error("Formularz ma błędy!", checkValidation)
       return
     }
-    else console.log("Wysłano formularz");
+    else
+
   }
 
   return (
@@ -116,6 +119,19 @@ function CharacterForm() {
   )
 }
 
+function CharacterCard(  {name, race, classs, description, level, isPublic}:Data)
+{
+  return (
+    <>
+    {name}
+    {race}
+    {classs}
+    {level}
+    {description}
+    {isPublic ? "tak" : "nie"}
+    </>
+  )
+}
 
 function App() {
 
