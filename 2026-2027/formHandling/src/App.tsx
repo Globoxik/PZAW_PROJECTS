@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './App.css'
 
 
 function CharacterForm() {
@@ -7,33 +6,64 @@ function CharacterForm() {
     name: "",
     race: "",
     class: "",
-    level: 0,
     description: "",
-    isPublic: true
   })
+
+  const [isPublic, setIsPublic] = useState(false);
+
+  const [level, setLevel] = useState(1);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    console.log("Wysłano formularz");
+  }
 
   return (
 
-    <form>
-      <label htmlFor='name'></label>
-      <input type='text' id='name'></input>
+    <form onSubmit={handleSubmit}>
+      <label htmlFor='name'>Nazwa:</label>
+      <input type='text' name='name' id='name' value={formData.name} onChange={handleChange} ></input>
 
-      <label htmlFor='race'></label>
-      <input type='select' id='race' required></input>
+      <label htmlFor='race'>Rasa:</label>
+      <select id='race' name='race' required value={formData.race} onChange={handleChange} >
 
-      <label htmlFor='class'></label>
-      <input type='select' id='class' required></input>
+        <option value="Wojownik">Wojownik</option>
+        <option value="Mag">Mag</option>
+        <option value="Łucznik">Łucznik</option>
 
-      <label htmlFor='level'></label>
-      <input type='number' id='level'></input>
+      </select>
 
-      <label htmlFor='description'></label>
-      <input type='textarea' id='description'></input>
+      <label htmlFor='class'>Klasa:</label>
+      <select id='class' name='class' required value={formData.class} onChange={handleChange}>
 
-      <label htmlFor='isPublic'></label>
-      <input type='checkbox' id='isPublic'></input>
+        <option value="Człowiek">Człowiek</option>
+        <option value="Elf">Elf</option>
+        <option value="Krasnolud">Krasnolud</option>
+        <option value="Ork">Ork</option>
 
-      <button type='submit'></button>
+      </select>
+
+      <label htmlFor='level'>Poziom:</label>
+      <input type='number' name='level' id='level' value={level} min={1} max={100} onChange={(event) => setLevel(Number(event.target.value))}></input>
+
+      <label htmlFor='description'>Opis:</label>
+      <input type='textarea' name='description' id='description' value={formData.description} onChange={handleChange} ></input>
+
+      <label htmlFor='isPublic'>Postać publiczna:</label>
+      <input type='checkbox' name='isPublic' id='isPublic' checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)}></input>
+
+      <button type='submit'>Wyślij</button>
     </form>
 
   )
@@ -41,11 +71,11 @@ function CharacterForm() {
 
 
 function App() {
-  const [count, setCount] = useState(0)
+
 
   return (
     <>
-
+      <CharacterForm />
     </>
   )
 }
