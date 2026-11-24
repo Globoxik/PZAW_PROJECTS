@@ -63,21 +63,29 @@ function CharacterForm() {
     return errors;
   }
 
-  var cardProps:Data[] = []
+  const [cardProps, setCardProps] = useState<Data[]>([]);
 
-  function handleSubmit(event) {
-    event.preventDefault();
+function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
-    const checkValidation = validateForm();
+  const checkValidation = validateForm();
 
-    if(Object.keys(checkValidation).length > 0)
-    {
-      console.error("Formularz ma błędy!", checkValidation)
-      return
-    }
-    else
-
+  if (Object.keys(checkValidation).length > 0) {
+    console.error("Formularz ma błędy!", checkValidation);
+    return;
   }
+
+  const newCharacter: Data = {
+    name: formData.name,
+    race: formData.race,
+    classs: formData.class,
+    description: formData.description,
+    level: level,
+    isPublic: isPublic
+  };
+
+  setCardProps(prev => [...prev, newCharacter]);
+}
 
   return (
 
@@ -130,6 +138,13 @@ function CharacterCard(  {name, race, classs, description, level, isPublic}:Data
     {description}
     {isPublic ? "tak" : "nie"}
     </>
+  )
+}
+
+function CardList()
+{
+  return(
+    
   )
 }
 
